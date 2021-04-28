@@ -13,13 +13,6 @@
 #define Max_Beverage_SourceNum 10 //Ã¿ÖÖÒûÆ·×î¶àÊ¹ÓÃµÄÔ­²ÄÁÏµÄÖÖÀàÊýÄ¿
 #define Total_Material_Num  18  //Ô­²ÄÁÏµÄÖÖÀàÊý
 
-/* È«¾Ö±äÁ¿ */
-int Total_Form_Num = 0;   //µ¼Èë¶©µ¥Á´±íÊý¾ÝµÄÊ±ºò»á½øÐÐ¸üÐÂ¸³Öµ
-int Total_Beverage_Num = 0;  //ÒûÆ·µÄÖÖÀàÊýÄ¿(µ¼ÈëÒûÆ·Á´±íÊý¾ÝµÄÊ±ºò»á½øÐÐ¸üÐÂ¸³Öµ)
-int month[13][30];//²»¸³Öµ»á³õÊ¼»¯Îª0Âð£¿»á¡£Ó¦¸Ã¶¨Òå13ÐÐÒòÎªµÚ0ÐÐ²»´ú±íÈÎºÎÔÂÊý¡£
-int season[5][30];//Ó¦¸Ã¶¨Òå5ÐÐÒòÎªµÚ0ÐÐ²»´ú±íÈÎºÎ¼¾½Ú¡£
-int year[2][30];
-
 /* ½á¹¹Ìå */
 //ÒûÆ·(beverage)
 typedef struct Beverage
@@ -75,6 +68,43 @@ typedef struct Complete_Form
     struct Complete_Form *next;
 }Complete_Form;
 
+//Ã¿¸ö»áÔ±µÄIDÉèÎªÒ»¸ö½á¹¹Ìå£¬ÀïÃæ°üº¬Ê±¼äÐÅÏ¢£¬·½±ãºóÃæ¼ìË÷ÓëÅÅÐò
+typedef struct ID_VIP
+{
+    char id[20];//200105301526
+    int year;
+    int month;
+    int day;
+    int hour;
+    int min;
+}IDVIP;
+
+//vipµÄ½á¹¹Ìå
+typedef struct vip {
+    IDVIP id;
+    char name[25];
+    char tel[25];
+    int position;//1 ·þÎñÔ± 2 µê³¤ 3 Çå½à¹¤ 4 ÊµÏ°Éú
+    float restmoney;
+    char password[25];
+    int loss;           // 0 for loss 1 for existing
+    int orders[200];  //¶©µ¥Êý×é£¬ÄÚÖÃ¶©µ¥id
+    struct vip *next;
+}VIP;
+//ÓÉÓÚÔ±¹¤µÄÊý¾Ý½á¹¹¸ú»áÔ±ºÜÏàËÆ£¬ËùÒÔÕâÀï¼Ì³ÐÁË»áÔ±µÄÊý¾Ý½á¹¹
+typedef struct vip STAFF;
+
+/* È«¾Ö±äÁ¿ */
+int Total_Form_Num = 0;   //µ¼Èë¶©µ¥Á´±íÊý¾ÝµÄÊ±ºò»á½øÐÐ¸üÐÂ¸³Öµ
+int Total_Beverage_Num = 0;  //ÒûÆ·µÄÖÖÀàÊýÄ¿(µ¼ÈëÒûÆ·Á´±íÊý¾ÝµÄÊ±ºò»á½øÐÐ¸üÐÂ¸³Öµ)
+int flag_come_back;  //È«¾Ö±äÁ¿ ÍË³ö ²»Éú³É½á¹û
+int auto_back;  //È«¾Ö±äÁ¿ ×÷ÎªÒ»ÏµÁÐ¶¯×÷Íê³É,Á¬Ðø»ØÍËµÄ±êÖ¾
+int month[13][30];  //²»¸³Öµ»á³õÊ¼»¯Îª0Âð£¿»á¡£Ó¦¸Ã¶¨Òå13ÐÐÒòÎªµÚ0ÐÐ²»´ú±íÈÎºÎÔÂÊý¡£
+int season[5][30];  //Ó¦¸Ã¶¨Òå5ÐÐÒòÎªµÚ0ÐÐ²»´ú±íÈÎºÎ¼¾½Ú¡£
+int year[2][30];
+int jugerFormOk;
+int ExplicitFlag = 1;  //½â¾ö´íÎóÊäÈëµ¼ÖÂµÄÉÁË¸ÎÊÌâ
+char bosspassword[21] = "11";
 //Ô­²ÄÁÏµÄÏûºÄÁ¿
 typedef struct Consumption
 {
@@ -86,17 +116,19 @@ typedef struct Consumption
 }Consumption;
 
 /* È«¾ÖÖ¸Õë±äÁ¿ */
-Beverage* head_beverage;
-Complete_Form* head_form;
-Material* head_material;
-Consumption* head_consumption;
+Beverage* head_beverage;  //ÒûÆ·ÖÖÀàÐÅÏ¢Á´±í
+Complete_Form* head_form;  //¶©µ¥ÐÅÏ¢Á´±í
+Material* head_material;  //Ô­²ÄÁÏÐÅÏ¢Á´±í
+Consumption* head_consumption;  //Ô­²ÄÁÏÏûºÄÐÅÏ¢Á´±í
+STAFF *head_staff;  //Ô±¹¤ÐÅÏ¢Á´±í
+VIP *head_vip;  //vipÐÅÏ¢Á´±í
+VIP *node_VIP;  //µ±Ç°µãµ¥µÄVIP¶ÔÓ¦µÄ½áµã(Èç¹ûµ±Ç°µãµ¥µÄ·Çvip,Ôò½áµãÖµÎªNULL)
+STAFF *node_STAFF;  //µ±Ç°½øÐÐ²Ù×÷µÄµêÔ±¶ÔÓ¦µÄ½áµã(×ÔÖúµãµ¥Ä£Ê½Ê±¼´ÎÞµêÔ±Ê±ÖµÎªNULL)
 
 //
 void Default();  //»¶Ó­½çÃæ
-void Order();  //µã²Í --ÔÝ¶¨orderÎÞ·µ»Ø£¬¿ÉÒÔ¸ÄÎª·µ»ØÒ»¸öÖ¸Ïò¸Ã´ÎÍêÕû¶©µ¥µÄÖ¸Õë
-void Guest();  //ÆÕÍ¨ÓÃ»§½çÃæ
-void Admin();  //¹ÜÀíÔ±½çÃæ
-void Root();  //boss½çÃæ
+void SAVE();
+void INIT();
 Complete_Form * Create_FormLinkList();  //´´½¨¶©µ¥ÐÅÏ¢Á´±í(´ÓÎÄ¼þÖÐµ¼ÈëËùÓÐ¶©µ¥ÐÅÏ¢),·µ»ØÖ¸Ïò¸ÃÁ´±íÉÚÎ»½áµãµÄÖ¸Õë
 Complete_Form* Find_Form(int x,Complete_Form* h);  //ÕÒµ½hÎªÉÚÎ»½áµãµÄ¶©µ¥Á´±íÖÐid.idÎªxµÄ½áµã£¬·µ»ØÖ¸Ïò¸Ã½áµãµÄÖ¸Õë
 Beverage* Create_BeverageLinkList();  //´´½¨ÒûÆ·ÖÖÀàµÄÁ´±í(´ÓÎÄ¼þÖÐµ¼ÈëÒûÆ·ÖÖÀàÐÅÏ¢),·µ»ØÖ¸Ïò¸ÃÁ´±íÉÚÎ»½áµãµÄÖ¸Õë
@@ -115,18 +147,81 @@ void Output_Form(Complete_Form* cf);  //½«cfÖ¸ÏòµÄ¶©µ¥ÐÅÏ¢Êä³öµ½ÎÄ¼þ
 void Create_ID(Complete_Form* cf);  //¶ÔcfÖ¸ÏòµÄ¶©µ¥µÄid¸ù¾Ýµ±Ç°µÄÊ±¼ä¶ÔÆä½øÐÐ¸³Öµ
 Material* Consume_Inventory(Complete_Form* cf);  //ÏûºÄcfÖ¸Ïò¶©µ¥ÖÐÐèÒªµÄÔ­²ÄÁÏ¿â´æ
 void Add_Form(Complete_Form*cf,Complete_Form* h);  //½«cfÖ¸ÏòµÄ¶©µ¥Ìí¼Óµ½¶©µ¥Á´±íÖÐ
+void Inventory_Manage();  //¿â´æ¹ÜÀíÒ³Ãæ
+void Add_Inventory();  //Ìí¼Ó¿â´æ
+int Show_Inventory();  //²é¿´ÏÖÓÐ¿â´æµÄÊ£ÓàÁ¿,·µ»Ø¿â´æÖÖÀàÊýÄ¿
+void Show_InventoryConsumption();  //²é¿´¿â´æÏûºÄ
+void Inventory_GetAdded(Material *m);  //¸ù¾ÝÓÃ»§µÄÑ¡ÔñÀ´Ìí¼Ó¿â´æ
+void Show_Inventory_ByConsumption();  //¸ù¾ÝÔ­²ÄÁÏÏûºÄÁ¿¶ÔÔ­²ÄÁÏµÄÏûºÄ½øÐÐÅÅÐòÕ¹Ê¾
+void ChangeShowWay(Consumption *head,Consumption *tail,int status);  //¸ù¾ÝstatusµÄÖµÀ´Ñ¡ÔñÊÇ°´ÏûºÄÁ¿´ÓÐ¡µ½´ó£¬»¹ÊÇ°´ÏûºÄÁ¿´Ó´óµ½Ð¡À´ÏÔÊ¾Ô­²ÄÁÏµÄ×ÜÏûºÄÁ¿(status=1Ê±ºò´ÓÐ¡µ½´ó,0Ê±´Ó´óµ½Ð¡)
+void Show_Inventory_ById();  //¸ù¾ÝÔ­²ÄÁÏµÄidÕ¹Ê¾¸÷²ÄÁÏµÄÏûºÄÁ¿
+Consumption* Create_ConsumptionLinkList();  //´´½¨Ô­²ÄÁÏÏûºÄµÄË«ÏòÁ´±í£¬´´½¨Ê±¼´½øÐÐ²åÈëÅÅÐò(ÏûºÄÁ¿´Ó´óµ½Ð¡)
+Consumption* Find_Consumption(int x,Consumption* h);  //ÔÚÔ­²ÄÁÏÏûºÄµÄË«ÏòÁ´±íÖÐÕÒµ½idÎªxµÄ½áµã²¢·µ»ØÖ¸ÏòÆäµÄÖ¸Õë
 void Rewrite_FormData();  //½«¸üÐÂºóµÄ¶©µ¥Á´±íÊý¾ÝÖØÐÂÐ´»ØÎÄ¼þÖÐ
 void Rewrite_BeverageData();  //½«¸üÐÂºóµÄÒûÆ·Á´±íÊý¾ÝÖØÐÂÐ´»ØÎÄ¼þÖÐ
 void Rewrite_MaterialData();  //½«¸üÐÂºóµÄÔ­²ÄÁÏÁ´±íÊý¾ÝÖØÐÂÐ´»ØÎÄ¼þÖÐ
-
-// void Clear_Price(Complete_Form* cf);  //¶ÔcfÖ¸ÏòµÄ¶©µ¥µÄËùÓÐµ¥¸ö¶©µ¥µÄ¼Û¸ñÇåÁã
-
+VIP *VIPReadFile();
+void VIPInputFile(VIP *VIPlisthead);
+void ClearArr_int(int *a, int size, int value);
+void ClearArr_char(char *a, int size, char value);
+void VIP__init__(VIP *node);
+struct tm *GetNowTime();
+int Register_tel(VIP *node,VIP *head);
+int Register_recharge(VIP *node);
+int VIPCheck_money(char *money);
+int C_INTtransf(char *money);
+Complete_Form *Find_Form(int x, Complete_Form *h);
+void ConsumeRecord(VIP *node, Complete_Form *head);
+void Add_VIPOrders(VIP *node, Complete_Form *cf);
+void UnchangeWindowSize();
+int inputYorN();
+void V_order_char(int version);
+void V_order_float(int version);
+void F_order_char(int version);
+void F_order_float(int version);
+int VIPShowList(VIP *head);  //ÏÔÊ¾ËùÓÐ»áÔ±ÐÅÏ¢£¬·µ»Ø»áÔ±¸öÊý
+void VIPdetele(VIP *head);  //É¾³ý»áÔ±
+VIP *Exedelete(VIP *head, int index);  //»áÔ±É¾³ý²½Öè--Ö´ÐÐ»áÔ±É¾³ý
+void ModandShowDetail(VIP *head);  //VIPadminoperationÖÐÒýÓÃ--ÐÞ¸Ä»áÔ±ÐÅÏ¢
+void ShowVIPadmin(VIP *node);  //ÏÔÊ¾µ¥Ò»»áÔ±ÏêÏ¸ÐÅÏ¢
+VIP *Find_Vip(VIP *head, int index);  //Ñ°ÕÒvip
+/*
+Ô±¹¤ÎÄ¼þµÄ¶ÁÈ¡¸ñÊ½£º
+_index,name,tel,money,password,loss(bool),position,(if(position)=1:orderlist....)
+index,name,tel,money,password,loss(bool),position,(if(position)=1:orderlist....)
+(ÏÂ»®Ïß'_'´ú±í¿Õ¸ñ)
+*/
+STAFF *STAFFReadFile();
+void STAFF__init__(STAFF *node);  //Ô±¹¤½áµã³õÊ¼»¯£¬·µ»ØÎÞÉÚ±ø½áµã
+/*
+Ô±¹¤ÎÄ¼þµÄÐ´Èë¸ñÊ½£º
+_index,name,tel,money,password,loss(bool),position,(if(position)=1:orderlist....)
+index,name,tel,money,password,loss(bool),position,(if(position)=1:orderlist....)
+(ÏÂ»®Ïß'_'´ú±í¿Õ¸ñ)
+*/
+void STAFFInputFile(STAFF *head);
+int STAFFPosition(STAFF *node);  //Ñ¡ÔñÔ±¹¤µÄÖ°Î»
+int STAFFmoney(VIP *node);  //Ñ¡ÔñÔ±¹¤µÄ¹¤×Ê
+STAFF *STAFFadd(STAFF *head);  //Ìí¼ÓÔ±¹¤
+int STAFFShowList(STAFF *head);  //ÏÔÊ¾Ô±¹¤ÁÐ±í
+void ShowSTAFFadmin(STAFF *node);  //ÏÔÊ¾µ¥¸öÔ±¹¤µÄ
+void ModandShowstaffDetail(STAFF *head,int version); //¶ÔÔ±¹¤µÄ²Ù×÷ºÍÐÞ¸Ä
+void STAFFdetele(STAFF *head);  //Ô±¹¤É¾³ý
+void VIPadminoperation();  //admin¶Ô»áÔ±µÄ²Ù×÷£¨API£©
+void STAFFadminoperation();  //root¶ÔÔ±¹¤µÄ²Ù×÷½çÃæ £¨API£©
+VIP *VIPRegister(VIP *VIPlisthead);
+VIP *VIPlogin(VIP *VIPheadlist);
+void STAFFoperationUSER(STAFF *node);
+void VIPoperationUSER(VIP *node);
+void Default();
+void ROOT();
+int RootLogin();
 //¹«¹²º¯Êý
 void toxy(int x,int y);//½«¹â±êÒÆ¶¯µ½x£¬y×ø±ê´¦
 void HideCursor(int x);//Òþ²Ø¹â±ê
 char *HidePassword();//Òþ²ØÃÜÂë
 int Check_Number(char ch[],int maxnum,int maxlen);  //¼ì²éÊý×ÖÊÇ·ñºÏ¹æ(ºÏ¹æÇÒ²»³¬¹ýmaxnu·µ»Ø¶ÔÓ¦µÄÊý×ÖÖµ£¬ºÏ¹æµ«³¬¹ýmax·µ»Ø-1£¬²»ºÏ¹æ·µ»Ø-2)
-// int Number_Check(char ch[]);
+void color(int x);  //ÉèÖÃ×ÖÌåÑÕÉ«
 
 //º¯ÊýÊµÏÖÇø
 void toxy(int x,int y)//½«¹â±êÒÆ¶¯µ½x£¬y×ø±ê´¦
@@ -209,7 +304,7 @@ Complete_Form* Create_FormLinkList()  //Í¨¹ý¶©µ¥ÎÄ¼þµ¼Èë¶©µ¥Êý¾Ý£¬²¢´´½¨Á´±í£¬·µ
     H->next = NULL;
     p = H;
     FILE* fp;
-    fp = fopen("..\\Form_Data.txt", "r");  //´ò¿ª´æ·ÅÒûÆ·Êý¾ÝµÄÎÄ¼þ
+    fp = fopen("Form_Data.txt", "r");  //´ò¿ª´æ·ÅÒûÆ·Êý¾ÝµÄÎÄ¼þ
     if(fp==NULL)  //´íÎóÌáÊ¾
     {
         printf("Can't open the file:%s","Form_data.txt");
@@ -254,7 +349,7 @@ Beverage* Create_BeverageLinkList()  //¶ÁÈëbeverageData.txtÖÐµÄÊý¾Ý´´½¨ÓÃÓÚ´æ´¢Ò
     H->next = NULL;
     p = H;  //ÀûÓÃpÀ´½øÐÐÉú³ÉÁ´±í£¬HÓÃÀ´·µ»Ø(p±íÊ¾Á´±íµÄÄ©Î²½áµã)
     FILE* fp;
-    fp = fopen("..\\beverageData2.txt", "r");  //´ò¿ª´æ·ÅÒûÆ·Êý¾ÝµÄÎÄ¼þ
+    fp = fopen("beverageData2.txt", "r");  //´ò¿ª´æ·ÅÒûÆ·Êý¾ÝµÄÎÄ¼þ
     if(fp==NULL)  //´íÎóÌáÊ¾
     {
         printf("Can't open the file!");
@@ -299,7 +394,7 @@ Material* Create_MaterialLinkList()  //´´½¨Ô­²ÄÁÏÖÖÀàµÄÁ´±í(´ÓÎÄ¼þÖÐµ¼ÈëÒûÆ·ÖÖÀà
     H->next = NULL;
     p = H;  //ÀûÓÃpÀ´½øÐÐÉú³ÉÁ´±í£¬HÓÃÀ´·µ»Ø(p±íÊ¾Á´±íµÄÄ©Î²½áµã)
     FILE* fp;
-    fp = fopen("..\\materialData.txt", "r");  //´ò¿ª´æ·ÅÒûÆ·Êý¾ÝµÄÎÄ¼þ
+    fp = fopen("materialData.txt", "r");  //´ò¿ª´æ·ÅÒûÆ·Êý¾ÝµÄÎÄ¼þ
     if(fp==NULL)  //´íÎóÌáÊ¾
     {
         printf("Can't open the file!");
@@ -354,16 +449,22 @@ void Order()
 {
     Complete_Form* CF;  //´´½¨Ò»¸öÖ¸ÏòÍêÕû¶©µ¥½á¹¹µÄÖ¸Õë,·½±ã°ü×°¶à¸öº¯Êý¶ÔÆä½øÐÐÐÞ¸Ä
     CF = (Complete_Form*)malloc(sizeof(Complete_Form));
+    if(node_VIP!=NULL)  // Èç¹ûÊÇ»áÔ±µÇÂ¼½çÃæ£¬node»á¸³Öµ£¬·ñÔònode¸³ÖµNULL
+    {               //Èç¹ûÊÇVIP¸øis_member¸³Öµ
+        CF->is_member = 1;
+    }
     CF->next = NULL;  //³õÊ¼»¯Ö¸ÕëÓòÎª¿Õ
     Create_ID(CF);
     Choose_FormNum(CF);
     int i = 1;  //¼ÆÊýÆ÷£¬±íÊ¾µ±Ç°ÎªµÚi±­
-    // while(i<=CF->number)
-    // {
     Choose_Beverage(CF,i);
-    //     i++;
-    // }
-    // Choose_Payway(CF);
+    if((node_VIP!=NULL)&&jugerFormOk){
+        Add_VIPOrders(node_VIP, CF);
+    }
+    if((node_STAFF != NULL)&&jugerFormOk){
+        Add_VIPOrders(node_STAFF, CF);
+    }
+    jugerFormOk = 0;
     return;
 }
 
@@ -464,6 +565,7 @@ void Choose_Ingredients(Complete_Form* cf,int i)
     toxy(12,6);
     HideCursor(0);
     printf("ÇëÑ¡ÔñµÚ%d±­ÐèÒªÌí¼ÓµÄÐ¡ÁÏ\n",i);
+    printf("\t\t°´ÏÂesc¼ü·µ»ØÖ÷Ò³Ãæ\n");
     printf("\t\t1.²¼¶¡--1Ôª\n");
     printf("\t\t2.Ò¬¹û--1Ôª\n");
     printf("\t\t3.ºì¶¹--2Ôª\n");
@@ -497,14 +599,28 @@ void Choose_Ingredients(Complete_Form* cf,int i)
         case '0':
             Order();
             return;
+        case 27:
+            Default();
+            return;
         default:
             printf("\t\tÊäÈë²»ºÏ¹æ,ÇëÖØÐÂÊäÈë");
             //Sleep(1000);  //ÔÝÍ£1ÃëÏÔÊ¾ÌáÊ¾ÐÅÏ¢
             Choose_Ingredients(cf,i);  //µÝ¹éÖ±ÖÁÊäÈëºÏ¹æ
             return;
     }
-    Choose_Temperature(cf,i);
-    return;
+    Material* ci_return = Consume_Inventory(cf);  //¸ù¾Ý¸Ã¶©µ¥ÐÅÏ¢¶Ô¿â´æ½øÐÐ¡°ÏûºÄ¡±
+    if(ci_return==NULL)  //Èô¿â´æ×ã¹»
+    {
+        Choose_Temperature(cf,i);  //Ñ¡ÔñÒûÆ·ÎÂ¶È
+        return;
+    }
+    else  //Ô­²ÄÁÏ¿â´æ²»×ã£¬¸ø³öÌáÊ¾£¬ÖØÐÂµãµ¥
+    {
+        printf("%s¿â´æ²»×ã£¬ÇëÁªÏµ¹ÜÀíÔ±½øÐÐÌí¼Ó,Á½Ãëºó×Ô¶¯·µ»Øµãµ¥Ò³Ãæ",ci_return->name);
+        Sleep(2000);
+        //Order(); //·µ»Øµãµ¥Ò³Ãæ
+        return;
+    }
 }
 
 void Choose_Temperature(Complete_Form* cf,int i)
@@ -514,6 +630,7 @@ void Choose_Temperature(Complete_Form* cf,int i)
     toxy(12,6);
     HideCursor(0);
     printf("ÇëÑ¡ÔñµÚ%d±­µÄÒûÓÃÎÂ¶È\n",i);
+    printf("\t\t°´ÏÂesc¼ü·µ»ØÖ÷Ò³Ãæ\n");
     printf("\t\t1.¼Ó±ù\n");
     printf("\t\t2.³£ÎÂ\n");
     printf("\t\t3.Î¢ÈÈ\n");
@@ -539,6 +656,9 @@ void Choose_Temperature(Complete_Form* cf,int i)
         case '0':
             Order();
             return;
+        case 27:
+            Default();
+            return;
         default:
             printf("\t\tÊäÈë²»ºÏ¹æ,ÇëÖØÐÂÊäÈë");
             //Sleep(1000);  //ÔÝÍ£1ÃëÏÔÊ¾ÌáÊ¾ÐÅÏ¢
@@ -556,6 +676,7 @@ void Choose_Drinkplace(Complete_Form* cf,int i)
     toxy(12,6);
     HideCursor(0);
     printf("ÇëÑ¡ÔñµÚ%d±­µÄÒûÓÃµØµã\n",i);
+    printf("\t\t°´ÏÂesc¼ü·µ»ØÖ÷Ò³Ãæ\n");
     printf("\t\t1.ÌÃÊ³\n");
     printf("\t\t2.Íâ´ø(´ò°ü)\n");
     printf("\t\t0.ÖØÐÂÑ¡Ôñ±­Êý\n");
@@ -572,6 +693,9 @@ void Choose_Drinkplace(Complete_Form* cf,int i)
             break;
         case '0':
             Order();  //ÖØÐÂÑ¡Ôñ±­Êý
+            return;
+        case 27:
+            Default();
             return;
         default:
             printf("\t\tÊäÈë²»ºÏ¹æ,ÇëÖØÐÂÊäÈë");
@@ -611,6 +735,7 @@ void Choose_Payway(Complete_Form* cf)
     HideCursor(0);
     Get_CpTotalprice(cf);
     printf("¶©µ¥×Ü¼ÛÎª:%.1fÔª,ÇëÑ¡ÔñÖ§¸¶·½Ê½\n",cf->total_price);
+    printf("\t\t°´ÏÂesc¼ü·µ»ØÖ÷Ò³Ãæ\n");
     printf("\t\t1.ÏÖ½ðÖ§¸¶\n");
     printf("\t\t2.ÔÚÏßÖ§¸¶\n");
     if(cf->is_member>0)
@@ -620,20 +745,25 @@ void Choose_Payway(Complete_Form* cf)
     fflush(stdin);
     t = getch();
     fflush(stdin);
-    if(cf->is_member>0)
+    if(cf->is_member==0)
     {
         switch (t)
         {
             case '1':
                 cf->pay_way = 1;
                 printf("\t\tÐ»Ð»»Ý¹Ë£¡£¡£¡");
+                jugerFormOk = 1;
                 //Sleep(1000);  //ÔÝÍ£1ÃëÏÔÊ¾ÌáÊ¾ÐÅÏ¢
                 break;
             case '2':
                 cf->pay_way = 2;
                 printf("\t\tÐ»Ð»»Ý¹Ë£¡£¡£¡");
+                jugerFormOk = 1;
                 //Sleep(1000);  //ÔÝÍ£1ÃëÏÔÊ¾ÌáÊ¾ÐÅÏ¢
                 break;
+            case 27:
+                Default();
+                return;
             default:
                 printf("\t\tÊäÈë²»ºÏ¹æ,ÇëÖØÐÂÊäÈë");
                 //Sleep(1000);  //ÔÝÍ£1ÃëÏÔÊ¾ÌáÊ¾ÐÅÏ¢
@@ -648,17 +778,32 @@ void Choose_Payway(Complete_Form* cf)
             case '1':
                 cf->pay_way = 1;
                 printf("\t\tÐ»Ð»»Ý¹Ë£¡£¡£¡");
+                jugerFormOk = 1;
                 Sleep(1000);  //ÔÝÍ£1ÃëÏÔÊ¾ÌáÊ¾ÐÅÏ¢
                 break;
             case '2':
                 cf->pay_way = 2;
                 printf("\t\tÐ»Ð»»Ý¹Ë£¡£¡£¡");
+                jugerFormOk = 1;
                 Sleep(1000);  //ÔÝÍ£1ÃëÏÔÊ¾ÌáÊ¾ÐÅÏ¢
                 break;
             case '3':
                 cf->pay_way = 3;
-                printf("\t\t»áÔ±¿¨Ö§¸¶Íê±Ï");
+                if(node_VIP->restmoney>cf->total_price){
+                    node_VIP->restmoney -= cf->total_price*0.85;
+                    printf("\t\t»áÔ±¿¨Ö§¸¶Íê±Ï,Äú»¹Ê£Óà%.2fÔª",node_VIP->restmoney);
+                    jugerFormOk = 1;
+                    Sleep(1000);
+                }
+                else{
+                    printf("\t\t»áÔ±¿¨Óà¶î²»×ã,Ö§¸¶Ê§°Ü");
+                    Sleep(1000);
+                    return;//Ö§¸¶Ê§°Ü²»»áÌí¼Óµ½¶©µ¥ÁÐ±í
+                }
                 break;
+            case 27:
+                Default();
+                return;
             default:
                 printf("\t\tÊäÈë²»ºÏ¹æ,ÇëÖØÐÂÊäÈë");
                 //Sleep(1000);  //ÔÝÍ£1ÃëÏÔÊ¾ÌáÊ¾ÐÅÏ¢
@@ -666,19 +811,7 @@ void Choose_Payway(Complete_Form* cf)
                 return;
         }
     }
-    Material* ci_return = Consume_Inventory(cf);
-    if(ci_return==NULL)  //¸ù¾Ý¸Ã¶©µ¥ÐÅÏ¢¶Ô¿â´æ½øÐÐ¡°ÏûºÄ¡±
-    {                       //Èô¿â´æ×ã¹»
-        Add_Form(cf,head_form);  //½«¸Ã¶©µ¥½áµãÌí¼Óµ½¶©µ¥Á´±íÖÐ
-    }
-    else  //Ô­²ÄÁÏ¿â´æ²»×ã£¬¸ø³öÌáÊ¾£¬ÖØÐÂµãµ¥
-    {
-        printf("%s¿â´æ²»×ã£¬ÇëÁªÏµ¹ÜÀíÔ±½øÐÐÌí¼Ó,Á½Ãëºó×Ô¶¯·µ»Øµãµ¥Ò³Ãæ",ci_return->name);
-        Sleep(2000);
-        Order(); //·µ»Øµãµ¥Ò³Ãæ
-        return;
-    }
-    // Out_put(cf);  //¶©µ¥ËùÓÐÐÅÏ¢¸³ÖµÍê±Ï,Êä³öµ½ÎÄ¼þ(³ÖÐø»¯´æ´¢)
+    Add_Form(cf,head_form);  //½«¸Ã¶©µ¥½áµãÌí¼Óµ½¶©µ¥Á´±íÖÐ
     return;
 }
 
@@ -746,7 +879,7 @@ void Rewrite_FormData()  //½«¸üÐÂºóµÄ¶©µ¥Á´±íÊý¾ÝÖØÐÂÐ´»ØÎÄ¼þÖÐ
     Complete_Form* cf = head_form->next;
     FILE * fp;
     int i;  //Ñ­»·¿ØÖÆ
-    fp = fopen("..\\Form_Data.txt","w");  //ÒÔ¸½¼Ó·½Ê½´ò¿ªÎÄ¼þ
+    fp = fopen("Form_Data.txt","w");  //ÒÔ¸½¼Ó·½Ê½´ò¿ªÎÄ¼þ
     while(cf!=NULL)  //Êä³öÈ«²¿
     {
         fprintf(fp,"%d,%d-%d-%d-%d:%d,%d\n",cf->id.id,cf->id.year,cf->id.month,cf->id.day,cf->id.hour,cf->id.min,cf->number);
@@ -806,7 +939,7 @@ void Rewrite_MaterialData()  //½«¸üÐÂºóµÄÔ­²ÄÁÏÁ´±íÊý¾ÝÖØÐÂÐ´»ØÎÄ¼þÖÐ
     Material * mat = head_material->next;
     FILE* fp;
     int i;
-    fp = fopen("..\\materialData.txt","w");
+    fp = fopen("materialData.txt","w");
     while(mat!=NULL)
     {
         fprintf(fp,"%d,%s,%.2f,%.2f",mat->id,mat->name,mat->consume,mat->inventory);
@@ -820,6 +953,25 @@ void Rewrite_MaterialData()  //½«¸üÐÂºóµÄÔ­²ÄÁÏÁ´±íÊý¾ÝÖØÐÂÐ´»ØÎÄ¼þÖÐ
     return;
 }
 
+/*
+    0=ºÚÉ«                8=»ÒÉ«¡¡¡¡
+  ¡¡1=À¶É«                9=µ­À¶É«            ¡¡¡¡
+¡¡¡¡2=ÂÌÉ«                10=µ­ÂÌÉ«             ¡¡¡¡
+¡¡¡¡3=ºþÀ¶É«              11=µ­Ç³ÂÌÉ«
+¡¡¡¡4=ºìÉ«                12=µ­ºìÉ«     ¡¡
+¡¡¡¡5=×ÏÉ«                13=µ­×ÏÉ«             ¡¡¡¡
+¡¡¡¡6=»ÆÉ«                14=µ­»ÆÉ«            ¡¡¡¡
+¡¡¡¡7=°×É«                15=ÁÁ°×É«
+*/
+void color(int x) {
+    if(x>=0 && x<=15){
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), x);
+    }
+    else{
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+    }
+
+}
 // void Clear_Price(Complete_Form* cf)  //¶ÔcfÖ¸ÏòµÄ¶©µ¥µÄËùÓÐµ¥¸ö¶©µ¥µÄ¼Û¸ñÇåÁã
 // {
 //     int i;
@@ -830,19 +982,2464 @@ void Rewrite_MaterialData()  //½«¸üÐÂºóµÄÔ­²ÄÁÏÁ´±íÊý¾ÝÖØÐÂÐ´»ØÎÄ¼þÖÐ
 //     return;
 // }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//¿â´æ¹ÜÀíÇø
-void Inventory_Manage();  //¿â´æ¹ÜÀíÒ³Ãæ
-void Add_Inventory();  //Ìí¼Ó¿â´æ
-int Show_Inventory();  //²é¿´ÏÖÓÐ¿â´æµÄÊ£ÓàÁ¿,·µ»Ø¿â´æÖÖÀàÊýÄ¿
-void Show_InventoryConsumption();  //²é¿´¿â´æÏûºÄ
-void Inventory_GetAdded(Material *m);  //¸ù¾ÝÓÃ»§µÄÑ¡ÔñÀ´Ìí¼Ó¿â´æ
-void Show_Inventory_ByConsumption();  //¸ù¾ÝÔ­²ÄÁÏÏûºÄÁ¿¶ÔÔ­²ÄÁÏµÄÏûºÄ½øÐÐÅÅÐòÕ¹Ê¾
-void ChangeShowWay(Consumption *head,Consumption *tail,int status);  //¸ù¾ÝstatusµÄÖµÀ´Ñ¡ÔñÊÇ°´ÏûºÄÁ¿´ÓÐ¡µ½´ó£¬»¹ÊÇ°´ÏûºÄÁ¿´Ó´óµ½Ð¡À´ÏÔÊ¾Ô­²ÄÁÏµÄ×ÜÏûºÄÁ¿(status=1Ê±ºò´ÓÐ¡µ½´ó,0Ê±´Ó´óµ½Ð¡)
-void Show_Inventory_ById();  //¸ù¾ÝÔ­²ÄÁÏµÄidÕ¹Ê¾¸÷²ÄÁÏµÄÏûºÄÁ¿
-float Get_TotalConsumption(int x);  //¼ìË÷ËùÓÐ¶©µ¥ÐÅÏ¢,·µ»ØÔ­²ÄÁÏidÎªxµÄÔ­²ÄÁÏµÄ×ÜÏûºÄÁ¿
-Consumption* Create_ConsumptionLinkList();  //´´½¨Ô­²ÄÁÏÏûºÄµÄË«ÏòÁ´±í£¬´´½¨Ê±¼´½øÐÐ²åÈëÅÅÐò(ÏûºÄÁ¿´Ó´óµ½Ð¡)
-Consumption* Find_Consumption(int x,Consumption* h);  //ÔÚÔ­²ÄÁÏÏûºÄµÄË«ÏòÁ´±íÖÐÕÒµ½idÎªxµÄ½áµã²¢·µ»ØÖ¸ÏòÆäµÄÖ¸Õë
+void VIPFunction(){
+    VIP *head = VIPReadFile();
+    int i = 2;
+    while(i--){
+        head = VIPRegister(head);
+    }
+    VIPInputFile(head);
+    head = VIPReadFile();
+}
+// 0´ú±í¼ì²â²»Í¨¹ý
+int VIPCheck_Name(char *a){
+    int len = strlen(a);
+    if(len>20||len<=0)
+        return 0;
+    for (int i = 0; i < len;i++){
+        if(a[i]==' '){
+            return 0;
+        }
+    }
+    return 1;
+}
+
+// return 0´ú±í·µ»Ø£¬1´ú±íÃ»¹ØÏµ*·µ»Ø/Ö÷½çÃæ
+int Register_Name(VIP *node){
+    int attation = 0;
+    while(1)
+    {
+        char temp[100] = {0};
+        char name[100] = {0};
+        toxy(48, 9);
+        printf("(°´ * ·µ»Ø£¡°´ ESC ·µ»ØÖ÷²Ëµ¥)");
+        toxy(48, 10);
+        strcpy(temp, "ÇëÊäÈëÄãµÄÐÕÃû£º");
+        printf("%s", temp);
+        int lenname = strlen(temp);
+        if(attation)
+            color(4);
+        toxy(48, 11);
+        printf("×¢Òâ£¡");
+        toxy(48, 12);
+        printf("²»Ó¦³¬³ö20¸ö×Ö·ûÇÒ²»ÄÜÎª¿Õ!");
+        toxy(48, 13);
+        printf("²»Ó¦°üÀ¨¿Õ¸ñ!");
+        if(attation){
+            toxy(48, 14);
+            color(17);
+            printf("ÇëÖØÊÔ£¡");
+        }
+        toxy(48 + lenname + 1, 10);
+        int i = 0;
+        char c = 1;
+        int flag = 0;
+        while(c){
+            int flag = 0;
+            fflush(stdin);
+            c = getch();
+            fflush(stdin);
+            switch (c)
+            {
+                case '*':
+                    fflush(stdin);
+                    system("cls");
+                    return 0;
+                case '\r':
+                    fflush(stdin);
+                    flag = 1;
+                    break;
+                case 27:
+                    fflush(stdin);
+                    system("cls");
+                    flag_come_back = 1;
+                    return 0;
+                case '\b':
+                    if(i>0){
+                        name[--i] = 0;
+                        printf("\b \b");
+                    }
+
+                default:
+                    if(c>31){
+                        if(i<20){
+                            name[i++] = c;
+                            printf("%c", c);
+                        }
+                        fflush(stdin);
+                        break;
+                    }
+                    else{
+                        fflush(stdin);
+                        break;
+                    }
+            }
+            if(flag)
+                break;
+            // //////////////////
+            // if(c=='*'){
+            //     fflush(stdin);
+            //     system("cls");
+            //     return 0;
+            // }
+            // else if(c=='\n'){
+            //     fflush(stdin);
+            //     break;
+            // }
+            // else if (c=='/')
+            // {
+            //     fflush(stdin);
+            //     system("cls");
+            //     flag_come_back = 1;
+            //     return 0;
+            // }
+            // name[i++] = c;
+        }
+        if(VIPCheck_Name(name))
+        {
+            strcpy(node->name, name);
+            system("cls");
+            return 1;
+        }
+        else
+        {
+            attation = 1;
+            system("cls");
+            continue;
+        }
+    }
+}
+// 0´ú±í¼ì²â²»Í¨¹ý -1´ú±íµç»°ÓÐÖØ¸´
+int VIPCheck_tel(char *tel,VIP *head){
+    int len = strlen(tel);
+    VIP *cur = head;
+    if(len>20||len<=0)
+        return 0;
+    for (int i = 0; i < len;i++){
+        if(tel[i]>'9'||tel[i]<'0')
+            return 0;
+    }
+    if(cur==NULL){
+        return 1;
+    }
+    while((cur!=NULL)&&(strcmp(cur->tel,tel)!=0)){
+        cur = cur->next;
+    }
+    if(cur == NULL){
+        return 1;
+    }
+    return -1;
+}
+
+// ×¢²áµç»°ºÅ 0Î´´´½¨£¬1´´½¨
+int Register_tel(VIP *node,VIP *head){
+    system("cls");
+    int attation = 0;
+    int flag_tel_repeat = 0;
+    while(1)
+    {
+        char temp[100] = {0};
+        char tel[100] = {0};
+        toxy(48, 9);
+        printf("(°´ * ·µ»Ø£¡°´ ESC ·µ»ØÖ÷²Ëµ¥)");
+        toxy(48, 10);
+        strcpy(temp, "ÇëÊäÈëÄãµÄµç»°:");
+        printf("%s", temp);
+        int lentel = strlen(temp);
+        if(attation)
+            color(4);
+        toxy(48, 11);
+        printf("×¢Òâ£¡");
+        toxy(48, 12);
+        printf("²»Ó¦³¬³ö20Î»Êý×ÖÇÒ²»ÄÜÎª¿Õ");
+        toxy(48, 13);
+        printf("Ö»ÄÜÊäÈëÊý×Ö");
+        toxy(48, 14);
+        printf("½öÖ§³ÖÒÆ¶¯ÊÖ»úºÅÂë");
+        toxy(48, 16);
+        color(17);
+        if(flag_tel_repeat){
+            flag_tel_repeat = 0;
+            color(4);
+            printf("´ËºÅÂëÒÑ´æÔÚ£¬ÇëÖØÐÂÊäÈë£¡");
+            color(17);
+            toxy(48, 15);
+            printf("ÇëÖØÊÔ£¡");
+        }
+        toxy(48, 15);
+        if(attation){
+            color(17);
+            printf("ÇëÖØÊÔ£¡");
+            attation = 0;
+        }
+        toxy(48 + lentel + 1, 10);
+        char c=1;
+        int i = 0;
+        while(c){
+            int flag = 0;
+            fflush(stdin);
+            c = getch();
+            fflush(stdin);
+            switch (c)
+            {
+                case '*':
+                    fflush(stdin);
+                    system("cls");
+                    return 0;
+                case '\r':
+                    fflush(stdin);
+                    flag = 1;
+                    break;
+                case 27:
+                    fflush(stdin);
+                    system("cls");
+                    flag_come_back = 1;
+                    return 0;
+                case '\b':
+                    if(i>0){
+                        tel[--i] = 0;
+                        printf("\b \b");
+                    }
+                default:
+                    if(c>31){
+                        if(i<20){
+                            tel[i++] = c;
+                            printf("%c", c);
+                        }
+                        fflush(stdin);
+                        break;
+                    }
+                    else{
+                        fflush(stdin);
+                        break;
+                    }
+            }
+            if(flag)
+                break;
+        }
+        int result = VIPCheck_tel(tel, head);
+        if(result==1)
+        {
+            strcpy(node->tel, tel);
+            system("cls");
+            return 1;
+        }
+        else if(result==-1){
+            flag_tel_repeat = 1;
+            system("cls");
+            continue;
+        }
+        {
+            attation = 1;
+            system("cls");
+            continue;
+        }
+    }
+}
+
+// ¼ì²âÃÜÂëºÏ·¨ÐÔ 0Í¨¹ý1²»Í¨¹ý
+int VIPCheck_password(char *password){
+    int len = strlen(password);
+    int flag = 0, flag_a = 1, flag_1 = 1,flag__=1;
+
+    if(len>16||len<8)
+        return 0;
+    for (int i = 0; i < len;i++){
+        if(password[i]==' ')
+            return 0;
+        if((password[i]<='9'&&password[i]>='0')&&flag_1){
+            flag++;
+            flag_1 = 0;
+        }
+        if(((password[i]<='Z'&&password[i]>='A'||password[i]<='z'&&password[i]>='a'))&&flag_a){
+            flag++;
+            flag_a = 0;
+        }
+        //±ðµÄ²»¿ÉÏÔÊ¾×Ö·ûÒÑ¾­±»c>31¹ýÂËµôÁË£¬Èç¹û²»ÊÇ×ÖÄ¸ºÍÊý×Ö±ØÊÇ×Ö·û
+        if(!((password[i]<='9'&&password[i]>='0')||(password[i]<='Z'&&password[i]>='A'||password[i]<='z'&&password[i]>='a'))&&flag__){
+            flag++;
+            flag__ = 1;
+        }
+    }
+    if(flag<2)
+        return 0;
+    return 1;
+}
+// ×¢²áÃÜÂë 0Î´´´½¨£¬1´´½¨
+int Register_password(VIP *node){
+    system("cls");
+    int attation = 0;
+    char password[100] = {0};
+    char repeat[100] = {0};
+    int norepeat = 0;
+    int lenpassword = 0;
+    while(1)
+    {
+        if(!norepeat){//È·ÈÏÕâ¸öconyinue²»ÊÇÒòÎªÊäÈë´íÎóÔì³ÉµÄ£¬¶øÊÇÎªÁËÊäÈërepeat
+            for (int i = 0; i < 100;i++)
+                password[i] = 0;
+        }
+        else{
+            attation = 0;//Èç¹ûÎªÁËrepeat²»ÒªÆô¶¯´íÎóÌáÐÑ
+        }
+        char temp[100] = {0};
+        if(norepeat){
+            toxy(48, 9);
+            printf("(°´ * ·µ»Ø£¡°´ ESC ·µ»ØÖ÷²Ëµ¥)");
+            toxy(48, 10);
+            strcpy(temp, "ÇëÊäÈëÄãµÄÃÜÂë:");
+            printf("%s", temp);// ÖØ¸´Ê±passwordÒÑ¾­ÌîºÃÁË
+            for (int i = 0; i < strlen(password);i++)
+                printf("*");
+            printf("\n");
+            lenpassword = strlen(temp);
+            toxy(48, 11);
+            strcpy(temp, "ÇëÖØÐÂÊäÈëÃÜÂë:");
+            printf("%s", temp);
+            toxy(48, 13);
+            if(norepeat>=2){
+                color(4);
+                printf("ÃÜÂë²»Æ¥Åä!");
+                color(17);
+            }
+            toxy(48, 12);
+            if (norepeat>=2)
+            {
+                color(18);
+                printf("ÇëÖØÊÔ!");
+                attation = 0;
+            }
+            if(norepeat){
+                toxy(48 + lenpassword + 1, 11);
+            }
+            else{
+                toxy(48 + lenpassword + 1, 10);
+            }
+            color(16);
+        }
+        else
+        {
+            toxy(48, 9);
+            printf("(°´ * ·µ»Ø£¡°´ ESC ·µ»ØÖ÷²Ëµ¥)");
+            toxy(48, 10);
+            strcpy(temp, "ÇëÊäÈëÄãµÄÃÜÂë:");
+            printf("%s", temp);
+            if(norepeat!=0){// ÖØ¸´Ê±passwordÒÑ¾­ÌîºÃÁË
+                for (int i = 0; i < strlen(password)-1;i++)
+                    printf("*");
+            }
+            int lenpassword = strlen(temp);
+            if (attation)
+                color(4);
+            toxy(48, 11);
+            printf("×¢Òâ!");
+            toxy(48, 12);
+            printf("²»ÄÜ°üÀ¨¿Õ¸ñÓë*ºÅ");
+            toxy(48, 13);
+            printf("³¤¶È±ØÐëÎª8-16¸ö×Ö·û");
+            toxy(48, 14);
+            printf("±ØÐë°üº¬Êý×Ö¡¢×ÖÄ¸¡¢·ûºÅÖÐÖÁÉÙ2ÖÖ");
+            color(16);
+            toxy(48, 15);
+            if (attation)
+            {
+                color(17);
+                printf("ÇëÖØÊÔ£¡");
+            }
+            if(norepeat){
+                toxy(48 + lenpassword + 1, 11);
+            }
+            else{
+                toxy(48 + lenpassword + 1, 10);
+            }
+        }
+
+        char c = 1;
+        int i = 0;
+        char tor[100] = {0};
+
+        while (c)
+        {
+            fflush(stdin);
+            c = getch();//²»»ØÏÔº¯Êý
+            fflush(stdin);
+            if(c<0){//ÅÅ³ýÉÏÏÂ·½Ïò¼üµÄÎÊÌâ
+                continue;
+            }
+
+            if (c == '*')
+            {
+                fflush(stdin);
+                system("cls");
+                return 0;
+            }//ÔÚgetchÖÐ»Ø³µ»á±»¶Á³É\r
+            else if (c == '\r'){
+                fflush(stdin);
+                break;
+            }
+            else if (c == 27)
+            {
+                system("cls");
+                fflush(stdin);
+                flag_come_back = 1;
+                return 0;
+            }
+            else if(c>31){
+                if(i<16){
+                    tor[i++] = c;
+                    printf("*");
+                }
+            }
+            else if(c=='\b')
+            {
+                if(i>0){
+                    tor[--i] = 0;
+                    printf("\b \b");
+                }
+            }
+
+
+
+
+        }
+        if(norepeat){// ·Ö±ð±£´æ
+            strcpy(repeat, tor);
+        }
+        else{
+            strcpy(password, tor);
+        }
+        if (VIPCheck_password(password))
+        {
+            if (strcmp(password, repeat) == 0)
+            {
+                strcpy(node->password, password);
+                system("cls");
+                return 1;
+            }
+            else
+            {
+                norepeat++;
+                system("cls");
+                continue;
+            }
+        }
+        else
+        {
+            attation = 1;
+            system("cls");
+            continue;
+        }
+    }
+}
+
+
+
+/*×¢²á»áÔ±*/
+VIP* VIPRegister(VIP*VIPlisthead){
+    VIP *p = (VIP *)malloc(sizeof(VIP));
+    VIP__init__(p);
+    VIP *cur = VIPlisthead;
+    if (cur != NULL) {
+        while(cur->next!=NULL)
+            cur = cur->next;
+    }
+    p->loss = 0; //Ä¬ÈÏÃ»ÓÐ¹ÒÊ§
+    while(1)
+    {// Ãû×Ö²¿·Ö
+        /*name space*/
+        if(flag_come_back||auto_back||Register_Name(p)==0){
+            if(auto_back){//autobackµÄÊ±ºòÒªbreakÖ´ÐÐºóÃæµÄ
+                auto_back = 0;
+                break;
+            }
+            else{
+                return VIPlisthead;//*&ESCÖ±½Ó»ØÈ¥¾ÍºÃ
+            }
+        }
+
+        while(1)// µç»°²¿·Ö
+        {
+            if(flag_come_back||auto_back||Register_tel(p,VIPlisthead)==0)
+                break;
+            while(1)// ÃÜÂë²¿·Ö
+            {
+                if(flag_come_back||auto_back||Register_password(p)==0)
+                    break;
+                while(1){// ³äÖµ²¿·Ö
+                    if(flag_come_back||auto_back||Register_recharge(p)==0)
+                        break;
+                    auto_back = 1;
+                    break;
+                }
+            }
+        }
+    }
+    //id ²¿·Ö
+    struct tm *NowTime = GetNowTime();
+    p->id.year = NowTime->tm_year+1900;
+    p->id.month = NowTime->tm_mon+1;
+    p->id.day = NowTime->tm_mday;
+    p->id.hour = NowTime->tm_hour+8;
+    p->id.min = NowTime->tm_min;
+    sprintf(p->id.id, "%04d%02d%02d%02d%02d\0",// ´¦ÀíIdvip½á¹¹ÌåÖÐid×Ö·ûÊý×é²¿·Ö
+            p->id.year, p->id.month, p->id.day, p->id.hour, p->id.min);
+    auto_back = 0;
+    if(flag_come_back){//Èç¹ûÁ¬Ðø»ØÍË¾Í²»ÓÃ±£´æ
+        free(p);
+        return VIPlisthead;
+    }
+    if(cur==NULL)
+        return p;
+    else{
+        cur->next = p;
+        return VIPlisthead;
+    }
+}
+
+
+/*
+¶ÁÈ¡vip»áÔ±Ãûµ¥£¬·µ»ØÒ»¸öÃ»ÓÐÉÚ±ø½áµãµÄVIPÐÍÁ´±í
+¸ñÊ½£º
+_index,name,tel,restmoney,password,loss(bool),(orderlist....)
+index,name,tel,restmoney,password,loss(bool),(orderlist....)
+(ÏÂ»®Ïß'_'´ú±í¿Õ¸ñ)
+*/
+VIP* VIPReadFile(){
+    //Èç¹ûÃ»ÓÐÎÄ¼þ£¬´´½¨ÎÄ¼þ
+    FILE *temp = fopen("PersonVIP.txt", "a");
+    fclose(temp);
+    FILE *fp = fopen("PersonVIP.txt", "r");
+    VIP *VIPlisthead = NULL, *VIPlistcur = NULL, *VIPlistlast = NULL;
+    VIPlisthead = VIPlistcur = (VIP *)malloc(sizeof(VIP));
+    VIPlisthead->next = NULL;
+    char flag = fgetc(fp);
+
+    while(flag!=EOF)
+    {
+        int i = 0;
+        VIP *p = (VIP *)malloc(sizeof(VIP));
+        VIP__init__(p);
+        // fscanf(fp, "%4d%2d%2d%2d%2d,%[^,],%[^,],%d,%[^,],%d",
+        //        &(p->id.year), &(p->id.month), &(p->id.day), &(p->id.hour), &(p->id.min),
+        //        (p->name), (p->tel), &(p->restmoney), (p->password), &(p->loss));
+        fscanf(fp,"%4d%2d%2d%2d%2d",&(p->id.year), &(p->id.month), &(p->id.day), &(p->id.hour), &(p->id.min));
+        fgetc(fp);
+        fscanf(fp,"%[^ ]",(p->name));
+        fgetc(fp);
+        fscanf(fp,"%[^ ]",p->tel);
+        fgetc(fp);
+        fscanf(fp,"%f",&(p->restmoney));
+        fgetc(fp);
+        fscanf(fp,"%[^ ]",p->password);
+        fgetc(fp);
+        fscanf(fp,"%d",&(p->loss));
+        sprintf(p->id.id, "%04d%02d%02d%02d%02d\0",// ´¦ÀíIdvip½á¹¹ÌåÖÐid×Ö·ûÊý×é²¿·Ö
+                p->id.year, p->id.month, p->id.day, p->id.hour, p->id.min);
+        flag = fgetc(fp);
+        VIPlistcur->next = p;
+        VIPlistcur = VIPlistcur->next;
+        if(flag!=' ')
+            continue;
+        do{
+            fscanf(fp, "%d", &(p->orders[i++]));
+            flag = fgetc(fp);
+        } while (flag == ',');
+
+    }
+    return VIPlisthead->next;
+}
+
+/*
+±£´æ»áÔ±Ãûµ¥£¬²ÎÊýÎªÒ»¸öÃ»ÓÐÉÚ±ø½áµãµÄVIPÐÍÁ´±í
+¸ñÊ½£º
+_index,name,tel,restmoney,password,loss(bool),(orderlist....)
+index,name,tel,restmoney,password,loss(bool),(orderlist....)
+(ÏÂ»®Ïß'_'´ú±í¿Õ¸ñ)
+*/
+void VIPInputFile(VIP *VIPlisthead){
+    VIP *p = VIPlisthead;
+    FILE *fp = fopen("PersonVIP.txt", "w");
+    int flag = 0;
+    while (p != NULL)
+    {   //ÎªÁËÊ¹×îºóÒ»ÐÐÎÞ»»ÐÐ
+        if(flag)
+        {
+            fprintf(fp, "\n%04d%02d%02d%02d%02d %s %s %.2f %s %d",
+                    p->id.year, p->id.month, p->id.day, p->id.hour, p->id.min,
+                    p->name, p->tel, p->restmoney, p->password, p->loss);
+            for (int i = 0, kase = 0; i < 100; i++)
+            {
+                if(p->orders[i]){
+                    if(!kase++)
+                        fprintf(fp," ");
+                    else{
+                        fprintf(fp, ",");
+                    }
+                    fprintf(fp, "%d", p->orders[i]);
+                }
+            }
+        }
+        else//µÚÒ»ÐÐÇ°Ãæ·Å¸ö¡® ¡¯·½±ã¼ì²âÎÄ¼þÊÇ·ñÎª¿Õ
+        {
+            fprintf(fp, " %04d%02d%02d%02d%02d %s %s %.2f %s %d",
+                    p->id.year, p->id.month, p->id.day, p->id.hour, p->id.min,
+                    p->name, p->tel, p->restmoney, p->password, p->loss);
+            for (int i = 0, kase = 0; i < 100; i++)
+            {
+                if(p->orders[i]){
+                    if(!kase++)
+                        fprintf(fp," ");
+                    else{
+                        fprintf(fp, ",");
+                    }
+                    fprintf(fp, "%d", p->orders[i]);
+                }
+            }
+            flag = 1;
+        }
+        p = p->next;
+    }
+    fclose(fp);
+}
+//intÐÍÊý×éµÄ³õÊ¼»¯
+void ClearArr_int(int *a,int size,int value){
+    int i = 0;
+    for (;i<size;i++)
+        a[i] = value;
+}
+//charÐÍÊý×éµÄ³õÊ¼»¯
+void ClearArr_char(char *a,int size,char value){
+    int i = 0;
+    for (;i<size;i++)
+        a[i] = value;
+}
+/*VIP½á¹¹ÌåµÄ³õÊ¼»¯º¯Êý£¬¸ù¾ÝÖ¸ÕëµÄÐÔÖÊ£¬Ïòº¯ÊýÖÐ´«ÈëÖ¸Õë£¬²»ÓÃ·µ»Ø*/
+void VIP__init__(VIP *node){
+    ClearArr_char(node->tel,sizeof(node->tel),0);
+    ClearArr_char(node->name,sizeof(node->name),0);
+    ClearArr_char(node->password, sizeof(node->password), 0);
+    ClearArr_int(node->orders, sizeof(node->orders) / 4, 0); //intÀàÐÍµÄ´óÐ¡ÊÇ4bytes
+    node->loss = 0;
+    node->restmoney = 0;
+    ClearArr_char(node->id.id, sizeof(node->id.id), 0);
+    node->id.day = 0;
+    node->id.month = 0;
+    node->id.year = 0;
+    node->id.min = 0;
+    node->id.hour = 0;
+    node->next = NULL;
+}
+//»ñÈ¡µ±Ç°Ê±¼äµÄº¯Êý£¬·µ»ØµÄÊÇtmÀàÐÍ½á¹¹Ìå£¬Ïê¼û£ºL-Click+Ctrl
+struct tm* GetNowTime(){
+    time_t timep;
+    struct tm *NowTime;
+    time (&timep);
+    NowTime=gmtime(&timep);
+    return NowTime;
+}
+// ¼ì²âÊäÈë½ð¶îµÄºÏ·¨ÐÔ
+int VIPCheck_money(char *money){
+    int len = strlen(money);
+    int kase = 0;
+    if(len>20)
+        return 0;
+    for(int i=0;i<len;i++){
+        if(money[i]=='.')
+            kase++;
+    }
+    if(kase>1)
+        return 0;
+    for (int i = 0; i < len;i++){
+        if(money[i]>'9'||money[i]<'0')
+            if(money[i]!='.')
+                return 0;
+    }
+    return 1;
+}
+// charÀàÐÍÊý×Ö->intÀàÐÍ
+int C_INTtransf(char *money){
+    int temp = 0;
+    int i = 0;
+    for (i = 0; money[i];i++);
+    int quanzhong = 1;
+    for (i = i - 1,quanzhong=1; i >= 0;i--,quanzhong*=10){
+        temp += quanzhong * (money[i]-'0');
+    }
+    return temp;
+}
+// ³äÖµ¹ý³Ì 0Î´³É¹¦£¬1³É¹¦
+int Register_recharge(VIP *node){
+    system("cls");
+    int attation = 0;
+    while(1)
+    {
+        char temp[100] = {0};
+        char money[100] = {0};
+        toxy(48, 9);
+        printf("°´ * ·µ»Ø£¡°´ ESC ·µ»ØÖ÷²Ëµ¥");
+        toxy(48, 10);
+        strcpy(temp, "ÇëÊäÈëÄúÒª³äÖµµÄ½ð¶î£¨Èç²»Ïë³äÖµÔò³äÖµ0Ôª£©");
+        printf("%s", temp);
+        int lentel = strlen(temp);
+        if(attation)
+            color(4);
+        toxy(48, 11);
+        printf("×¢Òâ£¡");
+        toxy(48, 12);
+        printf("³äÖµÇ®Êý²»µÃ¶àÓÚ20¸ö×Ö·û");
+        toxy(48, 13);
+        printf("½ö¿ÉÊäÈë½ð¶î");
+        toxy(48, 14);
+        if(attation){
+            color(17);
+            printf("ÇëÖØÊÔ£¡");
+        }
+        toxy(48 + lentel + 1, 10);
+        char c=1;
+        int i = 0;
+        while (c)
+        {
+            fflush(stdin);
+            c = getch();//²»»ØÏÔº¯Êý
+            fflush(stdin);
+            if(c<0){//ÅÅ³ýÉÏÏÂ·½Ïò¼üµÄÎÊÌâ
+                continue;
+            }
+
+            if (c == '*')
+            {
+                fflush(stdin);
+                system("cls");
+                return 0;
+            }//ÔÚgetchÖÐ»Ø³µ»á±»¶Á³É\r
+            else if (c == '\r'){
+                if(money[0]==0){
+                    fflush(stdin);
+                    continue;
+                }
+                fflush(stdin);
+                break;
+            }
+            else if (c == 27)
+            {
+                system("cls");
+                fflush(stdin);
+                flag_come_back = 1;
+                return 0;
+            }
+            else if(c>31){
+                if(i<20){
+                    money[i++] = c;
+                    printf("%c",c);
+                }
+            }
+            else if(c=='\b')
+            {
+                if(i>0){
+                    money[--i] = 0;
+                    printf("\b \b");
+                }
+            }
+
+
+
+
+        }
+        if(VIPCheck_money(money))
+        {
+            node->restmoney += (float)atof(money);
+            system("cls");
+            return 1;
+        }
+        else
+        {
+            attation = 1;
+            system("cls");
+            continue;
+        }
+    }
+}
+//ÒÔµç»°ÐÎÊ½½øÐÐ²éÕÒ£¬ÎÞµç»°·µ»ØNULL
+VIP *VIPSearchTel(char *targettel,VIP *head){
+    if(head == NULL)
+        return NULL;
+    if(head==NULL)
+        return NULL;
+    VIP *cur = head;
+    while(cur!=NULL&&(strcmp(cur->tel,targettel)!=0)){
+        cur = cur->next;
+    }
+    if(cur==NULL)
+        return NULL;
+    else{
+        return cur;
+    }
+}
+//»áÔ±µÇÂ¼£¬³É¹¦·µ»Ø½áµã£¬Ê§°Ü·µ»ØNULL
+VIP *VIPlogin(VIP *VIPheadlist){
+    char c = 1;
+    char telnum[20] = {0};
+    char password[20] = {0};
+    char temp[100] = {0};//¶¨Î»±êµãÓÃ
+    int i = 0,flag_errorcode=0,flag_notele=0;
+    int len = 0;
+    VIP *node = NULL;
+    // if(VIPheadlist == NULL){
+    //     return NULL;//Ã»ÓÐÓÃ»§(°´ÈÎÒâ¼ü¼ÌÐø)
+    // }
+    while(1){
+        toxy(48, 9);
+        printf("£¨°´ESC·µ»ØÖ÷²Ëµ¥*·µ»Ø£©");
+        strcpy(temp, "ÇëÊäÈëÊÖ»úºÅ£º");
+        toxy(48, 10);
+        printf("ÇëÊäÈëÊÖ»úºÅ£º");
+        if(flag_errorcode&&flag_come_back==0)
+            printf("%s", node->tel);
+        if(flag_notele){
+            toxy(48, 11);
+            color(4);
+            printf("²éÎÞÊÖ»úºÅ");
+            color(7);
+            flag_notele = 0;
+        }
+        toxy(48 + strlen(temp) + 1, 10);
+        ClearArr_char(temp, 100, 0);
+        ClearArr_char(telnum, 20, 0);
+        i = 0;// ÖØÐÂ¶ÔtelÊý×é¸³Öµ
+        while(!flag_errorcode){ //ÊäÈëÊÖ»úºÅ ÃÜÂëÊäÈë´íÎóËµÃ÷ÊÖ»úºÅÊäÈëÕýÈ·ÁË
+            fflush(stdin);
+            c = getch();
+            fflush(stdin);
+            len = strlen(telnum);
+
+            switch(c){
+                case 27:{ //ESC·µ»ØÖ÷²Ëµ¥
+                    fflush(stdin);
+                    return NULL;
+                }
+                case '\b':{// backspace
+                    if(len>0){
+                        telnum[--i] = 0;
+                        fflush(stdin);
+                        printf("\b \b");
+                    }
+                    continue;
+                }
+                case '\r':{// enter
+                    fflush(stdin);
+                    break;
+                }
+                case '*':{// ÊäÈëÊÖ»úºÅµÄ·µ»ØºÍESC×÷ÓÃÏàÍ¬
+                    fflush(stdin);
+                    return NULL;
+                }
+                default:{
+                    if(c>='0'&&c<='9'){
+                        printf("%c", c);
+                        telnum[i++] = c;
+                        fflush(stdin);
+                    }
+                    continue;
+                }
+            }
+            break;
+        }
+        if(!flag_errorcode){
+            node = VIPSearchTel(telnum,VIPheadlist);
+        }
+        if(node==NULL&&!flag_errorcode){
+            flag_notele = 1;
+            system("cls");
+            continue;//²éÎÞÊÖ»úºÅ ÖØÐÂ¿ªÊ¼ÐÂµÄ²éÑ¯ÊÖ»úºÅ²Ù×÷
+        }
+        strcpy(temp, "ÇëÊäÈëÃÜÂë£º");
+        toxy(48, 11);
+        printf("%s", temp);
+        if(flag_errorcode){
+            toxy(48, 12);
+            color(4);
+            printf("ÃÜÂë²»ÕýÈ·»òÇëÖØÐÂÈ·ÈÏÃÜÂë¸ñÊ½");
+            color(7);
+            flag_errorcode = 0;
+        }
+        toxy(48 + strlen(temp) + 1, 11);
+        ClearArr_char(temp, 100, 0);
+        c = 1;
+        i = 0;
+        ClearArr_char(password, 20, 0);
+        while(1){// ÊäÈëÃÜÂë
+            fflush(stdin);
+            c = getch();
+            fflush(stdin);
+            len = strlen(password);
+            switch(c){
+                case 27:{ //ESC·µ»ØÖ÷²Ëµ¥
+                    fflush(stdin);
+                    flag_come_back = 1;
+                    return 0;
+                }
+                case '\b':{// backspace
+                    if(len>0){
+                        password[--i] = 0;
+                        fflush(stdin);
+                        printf("\b \b");
+                    }
+                    continue;
+                }
+                case '\r':{// enter
+                    fflush(stdin);
+                    break;
+                }
+                case '*':{
+                    fflush(stdin);
+                    return 0;
+                    break;
+                }
+                default:{
+                    if(c>31){
+                        printf("*");
+                        password[i++] = c;
+                        fflush(stdin);
+                    }
+                    continue;
+                }
+            }
+
+            if(len<=0){
+                flag_errorcode = 1;//ÃÜÂëÊäÈë¸ñÊ½²»¶Ô
+                system("cls");
+            }
+            break;
+        }
+        if(flag_come_back){
+            system("cls");
+            fflush(stdin);
+            flag_errorcode = 0;
+            flag_come_back = 1;
+            continue;
+        }
+        if(strcmp(password,node->password)==0){
+            return node;
+        }
+        else{
+            flag_errorcode = 1;
+            system("cls");
+            continue;//ÃÜÂë²»ÕýÈ·
+        }
+    }
+}
+//Õ¹Ê¾user»áÔ±½çÃæ
+void VIPUSERshow(VIP *node){
+    system("cls");
+    printf("¿¨ºÅ£º%s\nÐÕÃû£º%s\nµç»°£º%s\n¿¨ÉÏÓà¶î£º%.2f\n¿¨×´Ì¬£º", node->id.id,node->name ,node->tel, node->restmoney);
+    if(node->loss){
+        color(4);
+        printf("¹ÒÊ§\n");
+        color(17);
+    }
+    else{
+        printf("Õý³£\n");
+    }
+    if(node->loss){
+        printf("ÇëÊäÈë²Ù×÷£º1.³äÖµ 2.½â¹Ò 3.²é¿´Ïû·Ñ¼ÇÂ¼ 4.ÐÞ¸ÄÃÜÂë 5.ÐÞ¸Äµç»° *·µ»Ø ESC.ÍË³öµÇÂ¼\n");
+    }
+    else{
+        printf("ÇëÊäÈë²Ù×÷£º1.³äÖµ 2.¹ÒÊ§ 3.²é¿´Ïû·Ñ¼ÇÂ¼ 4.ÐÞ¸ÄÃÜÂë 5.ÐÞ¸Äµç»° 6.»áÔ±µã²Í *·µ»Ø ESC.ÍË³öµÇÂ¼\n");
+    }
+}
+// ²Ù×÷·´À¡³É¹¦½çÃæ
+void Operationok(int state){
+    int time = 3;
+    while(time){
+        system("cls");
+        toxy(40, 15);
+        if(state){
+            printf("²Ù×÷³É¹¦£¡½«ÓÚ%dÃëºó·µ»Ø",time);
+        }
+        else{
+            printf("²Ù×÷Ê§°Ü£¡½«ÓÚ%dÃëºó·µ»Ø",time);
+        }
+        Sleep(1000);
+        time--;
+    }
+}
+// »áÔ±¿¨¹ÒÊ§
+void VIPloss(VIP *node){
+
+    while(1){
+        system("cls");
+        printf("»áÔ±¿¨ºÅ£º%s\nÐÕÃû£º%s\n»áÔ±¿¨×´Ì¬£º",node->id.id,node->name);
+        color(4);
+        if(node->loss){
+            printf("¹ÒÊ§");
+            color(17);
+            printf("\nÊÇ·ñ½â¹Ò£¿£¨Y/N£©");
+        }
+        else{
+            printf("Î´¹ÒÊ§");
+            color(17);
+            printf("\nÊÇ·ñ¹ÒÊ§£¿£¨Y/N£©");
+        }
+        char choose = 0;
+        int canelchoose = 0;
+        while(1){//ÊäÈëÑ¡Ôñ£¿
+            fflush(stdin);
+            choose = getch();
+            fflush(stdin);
+            int flag = 0;
+            switch(choose){
+                case 'N':
+                    canelchoose = 1;
+                    break;
+                case 'Y':
+                    node->loss ^= 1;
+                    Operationok(1);
+                    canelchoose = 1;
+                    break;
+                default:
+                    flag = 1;
+                    break;
+            }
+            if(flag){
+                flag = 0;
+            }
+            else{
+                break;
+            }
+        }
+        if(canelchoose){
+            canelchoose = 0;
+            break;
+        }
+    }
+}
+// Õ¹Ê¾µ¥Ò»¶©µ¥
+void show_form(Complete_Form *node){
+    printf("---%04dÄê%02dÔÂ%02dÈÕ %02d:%02d---\n", node->id.year, node->id.month, node->id.day, node->id.hour, node->id.min);
+    int i = 0;
+    for (;i < node->number;i++){
+        Beverage *detail = Find_Beverage(node->id.id, head_beverage);
+
+        printf("ÒûÆ·Ãû³Æ£º%s  ¸½¼ÓÐ¡ÁÏ£º", detail->name);
+        switch(node->forms[i].ingredients){
+            case 1:
+                printf("²¼¶¡  ");
+                break;
+            case 2:
+                printf("Ò¬¹û  ");
+                break;
+            case 3:
+                printf("ºì¶¹  ");
+                break;
+            case 4:
+                printf("ÕäÖé  ");
+                break;
+            case 5 :
+                printf("ÎÞ  ");
+                break;
+        }
+        printf("µ¥¼Û£º%2.1f\n", node->forms[i].total_price);
+    }
+    printf("---Ö§¸¶·½Ê½£º");
+    switch(node->pay_way){
+        case 1:
+            printf("ÏÖ½ðÖ§¸¶--");
+            break;
+        case 2:
+            printf("ÔÚÏßÖ§¸¶--");
+            break;
+        case 3:
+            printf("»áÔ±¿¨Ö§¸¶--");
+            break;
+    }
+    printf("×Ü¼Æ½ð¶î£º%2.1f---", node->total_price);
+}
+// Õ¹Ê¾»áÔ±Ïû·Ñ¼ÇÂ¼£¬¶à¸ö¶©µ¥
+void ConsumeRecord(VIP *node,Complete_Form *head){//headÎª´øÓÐÉÚ±ø½áµãµÄ¶©µ¥Á´±í
+    system("cls");
+    int len = 0;
+    Complete_Form *FormInfo=NULL;
+    for (; node->orders[len];len++);
+    if(len==0){
+        printf("ÎÞ¶©µ¥ÐÅÏ¢\n----------\n");
+    }
+    else{
+        int i = 0;
+        int index = node->orders[i];
+        while(index){
+            FormInfo = Find_Form(index, head);
+            if (FormInfo != NULL)
+            {
+                show_form(FormInfo);
+                printf("\n\n");
+            }
+
+            index = node->orders[++i];
+        }
+    }
+    printf("°´*·µ»Ø °´ESC·µ»ØÖ÷²Ëµ¥");
+    while(1){
+        char choose = 0;
+        fflush(stdin);
+        choose = getch();
+        fflush(stdin);
+        switch(choose){
+            case 27:
+                flag_come_back = 1;
+                return;
+            case '*':
+                system("cls");
+                return;
+            default:
+                break;
+        }
+    }
+}
+
+//user»áÔ±²Ù×÷
+void VIPoperationUSER(VIP *node){
+    char operation = 0;
+    if(node==NULL)
+        return;
+    while(1){
+        VIPUSERshow(node);
+        fflush(stdin);
+        operation = getch();
+        fflush(stdin);
+        switch(operation){
+            case 27:
+                flag_come_back = 1;
+                break;
+            case '1':
+                if(Register_recharge(node)){
+                    Operationok(1);
+                }
+                break;
+            case '2':
+                VIPloss(node);
+                break;
+            case '3':
+                ConsumeRecord(node,head_form);
+                break;
+            case '4':
+                Register_password(node);
+                break;
+            case '5':
+                Register_tel(node,head_vip);
+                break;
+            case '*':
+                return;
+            default:
+                if(operation=='6'&&node->loss==0){
+                    node_VIP = node;
+                    Order();
+                }
+                break;
+        }
+        if(flag_come_back){
+            flag_come_back = 1;
+            return;
+        }
+    }
+}
+
+int VIPShowList(VIP *head){
+    system("cls");
+    VIP *cur = head;
+    if(cur == NULL){
+        printf("ÔÝÎÞ»áÔ±ÐÅÏ¢");
+        return 0;
+    }
+    int index = 1;
+    while(cur!=NULL){
+        printf("ÐòºÅ£º%d  ×¢²áÊ±¼ä£º%4d-%02d-%02d %02d:%02d  ÐÕÃû£º%-20s  ÊÖ»úºÅ£º%-20s  ÃÜÂë£º*****  Óà¶î£º%-10.2f  ¿¨×´Ì¬£º", 
+        index, cur->id.year,cur->id.month,cur->id.day,cur->id.hour,cur->id.min, cur->name, cur->tel,cur->restmoney);
+        if(cur->loss){
+            color(4);
+            printf("¹ÒÊ§\n");
+            color(17);
+        }
+        else{
+            printf("Õý³£\n");
+        }
+        index++;
+        cur = cur->next;
+    }
+    return index - 1;
+}
+
+void VIPadminoperation(){
+    int time = 0, money = 0;//0´ú±íÕýÐò 1´ú±íµ¹Ðò
+    while(1){
+        system("cls");//´òÓ¡½çÃæ
+        VIPShowList(head_vip);
+        printf("\n\n\n");
+        printf("1.Ôö¼Ó»áÔ± 2.×¢Ïú»áÔ± 3.ÐÞ¸Ä/²é¿´»áÔ±ÏêÏ¸ÐÅÏ¢ 4.°´Ê±¼äÅÅÐò 5.°´Óà¶îÅÅÐò ESC.·µ»ØÖ÷²Ëµ¥ *·µ»Ø\n");
+        while(1){//ÊäÈë¹ÜÀí
+            int choose = 0;
+            fflush(stdin);
+            choose = getch();
+            fflush(stdin);
+            switch(choose){
+                case '1':
+                    system("cls");
+                    VIPRegister(head_vip);
+                    if(flag_come_back){
+                        return;
+                    }
+                    break;
+                case '2':
+                    VIPdetele(head_vip);
+                    break;
+                case '3':
+                    ModandShowDetail(head_vip); //ÐÞ¸Ä/²é¿´»áÔ±ÏêÏ¸ÐÅÏ¢
+                    break;
+                case '4':
+                    V_order_char(time ^= 1);
+                    break;
+                case '5':
+                    V_order_float(money ^= 1);
+                    break;
+                case 27:
+                    flag_come_back = 1;
+                    return;
+                case '*':
+                    //·µ»Ø
+                    return;
+                default:
+                    continue;
+            }
+            break;
+        }
+        if(flag_come_back){
+            return;
+        }
+    }
+}
+
+void VIPdetele(VIP *head){
+    int error = 0;
+    int number = 0;
+    char number_char[100] = {0}, index_char[100] = {0}, temp = 0;
+    int i = 0, overinput = 0;
+    while(1){//ÊäÈë±àºÅ
+        i = 0;
+        system("cls");
+        number = VIPShowList(head);
+        printf("\n\n");
+        if(error){
+            error = 0;
+            color(4);
+            printf("\nÇëÊäÈëÕýÈ·µÄ±àºÅ(*·µ»Ø£¬ESC·µ»ØÖ÷²Ëµ¥)\n");
+            color(17);
+        }
+        printf("ÇëÊäÈëÒª×¢Ïú»áÔ±µÄ±àºÅ£º£¨*·µ»Ø ESC·µ»ØÖ÷²Ëµ¥£©");
+        while(1){
+            fflush(stdin);
+            temp = getch();
+            fflush(stdin);
+            switch(temp){
+                case 27:
+                    flag_come_back = 1;
+                    return;
+                case '*':
+                    return;
+                case '\r':
+                    overinput = 1;
+                    break;
+                case '\b':
+                    if(i>0){
+                        printf("\b \b");
+                        index_char[--i] = 0;
+                    }
+                    break;
+                default:
+                    if(temp<='9'&&temp>='0'){
+                        if(i<=10){
+                            index_char[i++] = temp;
+                            printf("%c", temp);
+                            break;
+                        }
+                    }
+            }
+            if(overinput == 1){
+                overinput = 0;
+                break;
+            }
+        }
+        int index = C_INTtransf(index_char);
+        ClearArr_char(index_char, 100, 0);
+        if (index > number||index == 0)
+        {
+            error = 1;
+        }
+        else{//È·ÈÏ£¿
+            printf("\nÈ·¶¨Òª×¢ÏúÐòºÅÎª%dµÄ»áÔ±£¿£¨Y/N£©", index);
+            char confrim = 0;
+            int flag_back = 0;
+            while(1){
+                fflush(stdin);
+                confrim = getch();
+                fflush(stdin);
+                switch(confrim){
+                    case 'Y'://Ö´ÐÐÉ¾³ý
+                        head = Exedelete(head,index);
+                        flag_back = 1;
+                        Operationok(1);
+                        break;
+                    case 'N':
+                        flag_back = 1;
+                        break;
+                    default:
+                        continue;
+                }
+                if(flag_back){
+                    flag_back = 0;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+VIP *Exedelete(VIP *head,int index){
+    VIP *p=(VIP *)malloc(sizeof(VIP));
+    p->next = head;
+    head = p;//ÉÚ±ø½áµã
+    VIP *cur = head;
+    for (int i = 1;i<index;i++){
+        cur = cur->next;
+    }//Èç¹ûÉ¾³ýµÚn¸ö½áµãcur»áÔÚn-1£¬pÔÚn+1
+    VIP *del = cur->next;
+    p = cur->next->next;
+    cur->next = p;
+    free(del);
+    return head->next;//È¥ÉÚ±ø½áµã
+}
+
+void ModandShowDetail(VIP *head){
+    int error = 0;
+    int number = 0;
+    char number_char[100] = {0}, index_char[100] = {0}, temp = 0;
+    int i = 0, overinput = 0;
+    while(1){//ÊäÈë±àºÅ
+        i = 0;
+        system("cls");
+        number = VIPShowList(head);
+        printf("\n\n");
+        if(error){
+            error = 0;
+            color(4);
+            printf("\nÇëÊäÈëÕýÈ·µÄ±àºÅ(*·µ»Ø£¬ESC·µ»ØÖ÷²Ëµ¥)\n");
+            color(17);
+        }
+        printf("ÇëÊäÈëÒªÐÞ¸Ä²é¿´»áÔ±µÄ±àºÅ£º£¨*·µ»Ø ESC·µ»ØÖ÷²Ëµ¥£©");
+        while(1){
+            fflush(stdin);
+            temp = getch();
+            fflush(stdin);
+            switch(temp){
+                case 27:
+                    flag_come_back = 1;
+                    return;
+                case '*':
+                    return;
+                case '\r':
+                    overinput = 1;
+                    break;
+                case '\b':
+                    if(i>0){
+                        printf("\b \b");
+                        index_char[--i] = 0;
+                    }
+                    break;
+                default:
+                    if(temp<='9'&&temp>='0'){
+                        if(i<=10){
+                            index_char[i++] = temp;
+                            printf("%c", temp);
+                            break;
+                        }
+                    }
+            }
+            if(overinput == 1){
+                overinput = 0;
+                break;
+            }
+
+        }
+        float index = atof(index_char);
+        ClearArr_char(index_char, 100, 0);
+        if (index > number||index == 0)
+        {
+            error = 1;
+            continue;
+        }
+        while(1){
+            char choose = 0;
+            VIP *node = Find_Vip(head, index);
+            ShowVIPadmin(node);
+            printf("\n\n1.ÐÞ¸ÄÃÜÂë 2.ÐÞ¸ÄÊÖ»úºÅ 3.½â¹ÒÊ§ 4.²é¿´Ïû·Ñ¼ÇÂ¼ *·µ»Ø ESC·µ»ØÖ÷²Ëµ¥");
+            int flag_back = 0;
+            while(1){// ÊäÈë
+                fflush(stdin);
+                choose = getch();
+                fflush(stdin);
+                switch(choose){
+                    case '1' :
+                        system("cls");
+                        if(Register_password(node))
+                            Operationok(1);
+                        break;
+                    case '2':
+                        system("cls");
+                        if(Register_tel(node,head))
+                            Operationok(1);
+                        break;
+                    case '3':
+                        system("cls");
+                        VIPloss(node);
+                        break;
+                    case '4':
+                        ConsumeRecord(node, head_form);
+                        break;
+                    case '*':
+                        flag_back = 1;
+                        break;
+                    case 27:
+                        flag_come_back = 1;
+                        return;
+                    default:
+                        continue;
+                }
+                break;
+            }
+            if(flag_back){
+                flag_back = 0;
+                break;
+            }
+            if(flag_come_back){
+                return;
+            }
+        }
+    }
+}
+
+VIP *Find_Vip(VIP *head,int index){
+    VIP *cur = head;
+    for (int i = 1; i < index;i++){
+        if(cur==NULL)
+            return NULL;
+        cur = cur->next;
+    }
+    return cur;
+}
+
+void ShowVIPadmin(VIP *node){
+    system("cls");
+    printf("×¢²áÊ±¼ä£º%04d-%02d-%02d %02d:%02d\nÐÕÃû£º%s\nµç»°£º%s\nÃÜÂë£º%s\n¿¨ÉÏÓà¶î£º%.2f\n¿¨×´Ì¬£º",
+           node->id.year + 1900, node->id.month + 1, node->id.day, node->id.hour + 8, node->id.min,
+           node->name, node->tel, node->password, node->restmoney);
+    if(node->loss){
+        color(4);
+        printf("¹ÒÊ§\n");
+        color(17);
+    }
+    else{
+        printf("Õý³£\n");
+    }
+}
+
+STAFF * STAFFReadFile(){
+    //Èç¹ûÃ»ÓÐÎÄ¼þ£¬´´½¨ÎÄ¼þ
+    FILE *temp = fopen("PersonStaff.txt", "a");
+    fclose(temp);
+    FILE *fp = fopen("PersonStaff.txt", "r");
+    STAFF *head = NULL, *cur = NULL, *last = NULL;
+    head = cur = (STAFF *)malloc(sizeof(STAFF));
+    head->next = NULL;
+    char flag = fgetc(fp);
+
+    while(flag!=EOF)
+    {
+        int i = 0;
+        STAFF *p = (STAFF *)malloc(sizeof(STAFF));
+        STAFF__init__(p);
+        // fscanf(fp, "%4d%2d%2d%2d%2d,%[^,],%[^,],%d,%[^,],%d",
+        //        &(p->id.year), &(p->id.month), &(p->id.day), &(p->id.hour), &(p->id.min),
+        //        (p->name), (p->tel), &(p->restmoney), (p->password), &(p->loss));
+        fscanf(fp,"%4d%2d%2d%2d%2d",&(p->id.year), &(p->id.month), &(p->id.day), &(p->id.hour), &(p->id.min));
+        fgetc(fp);
+        fscanf(fp,"%[^ ]",(p->name));
+        fgetc(fp);
+        fscanf(fp,"%[^ ]",p->tel);
+        fgetc(fp);
+        fscanf(fp,"%f",&(p->restmoney));
+        fgetc(fp);
+        fscanf(fp,"%[^ ]",p->password);
+        fgetc(fp);
+        fscanf(fp,"%d",&(p->loss));
+        fgetc(fp);
+        fscanf(fp, "%d", &(p->position));
+        sprintf(p->id.id, "%04d%02d%02d%02d%02d\0",// ´¦ÀíIdvip½á¹¹ÌåÖÐid×Ö·ûÊý×é²¿·Ö
+                p->id.year, p->id.month, p->id.day, p->id.hour, p->id.min);
+        flag = fgetc(fp);
+        cur->next = p;
+        cur = cur->next;
+        if(flag!=' ') //Ã»ÓÐorders
+            continue;
+        do{
+            fscanf(fp, "%d", &(p->orders[i++]));
+            flag = fgetc(fp);
+        } while (flag == ',');
+
+    }
+    return head->next;
+}
+
+/*STAFF½á¹¹ÌåµÄ³õÊ¼»¯º¯Êý£¬¸ù¾ÝÖ¸ÕëµÄÐÔÖÊ£¬Ïòº¯ÊýÖÐ´«ÈëÖ¸Õë£¬²»ÓÃ·µ»Ø*/
+void STAFF__init__(STAFF *node){
+    ClearArr_char(node->tel,sizeof(node->tel),0);
+    ClearArr_char(node->name,sizeof(node->name),0);
+    ClearArr_char(node->password, sizeof(node->password), 0);
+    ClearArr_int(node->orders, sizeof(node->orders) / 4, 0); //intÀàÐÍµÄ´óÐ¡ÊÇ4bytes
+    node->loss = 0;
+    node->restmoney = 0;
+    ClearArr_char(node->id.id, sizeof(node->id.id), 0);
+    node->id.day = 0;
+    node->id.month = 0;
+    node->id.year = 0;
+    node->id.min = 0;
+    node->id.hour = 0;
+    node->position = 0;
+    node->next = NULL;
+}
+
+// ±£´æ»áÔ±Ãûµ¥£¬²ÎÊýÎªÒ»¸öÃ»ÓÐÉÚ±ø½áµãµÄVIPÐÍÁ´±í
+void STAFFInputFile(STAFF *head){
+    STAFF *p = head;
+    FILE *fp = fopen("PersonStaff.txt", "w");
+    int flag = 0;
+    while (p != NULL)
+    {   //ÎªÁËÊ¹×îºóÒ»ÐÐÎÞ»»ÐÐ
+        if(flag)
+        {
+            fprintf(fp, "\n%04d%02d%02d%02d%02d %s %s %.2f %s %d %d",
+                    p->id.year, p->id.month, p->id.day, p->id.hour, p->id.min,
+                    p->name, p->tel, p->restmoney, p->password, p->loss,p->position);
+            for (int i = 0, kase = 0; i < 100; i++)
+            {
+                if(p->orders[i]){
+                    if(!kase++)
+                        fprintf(fp," ");
+                    else{
+                        fprintf(fp, ",");
+                    }
+                    fprintf(fp, "%d", p->orders[i]);
+                }
+            }
+        }
+        else//µÚÒ»ÐÐÇ°Ãæ·Å¸ö¡® ¡¯·½±ã¼ì²âÎÄ¼þÊÇ·ñÎª¿Õ
+        {
+            fprintf(fp, " %04d%02d%02d%02d%02d %s %s %.2f %s %d %d",
+                    p->id.year, p->id.month, p->id.day, p->id.hour, p->id.min,
+                    p->name, p->tel, p->restmoney, p->password, p->loss,p->position);
+            for (int i = 0, kase = 0; i < 100; i++)
+            {
+                if(p->orders[i]){
+                    if(!kase++)
+                        fprintf(fp," ");
+                    else{
+                        fprintf(fp, ",");
+                    }
+                    fprintf(fp, "%d", p->orders[i]);
+                }
+            }
+            flag = 1;
+        }
+        p = p->next;
+    }
+    fclose(fp);
+}
+
+int STAFFPosition(STAFF *node){
+    system("cls");
+    toxy(48,10);
+    printf("ÇëÑ¡ÔñÖ°Î»£º");
+    toxy(48,11);
+    printf("1.·þÎñÔ± 2.µê³¤ 3.Çå½à¹¤ 4.ÊµÏ°Éú *·µ»Ø ESCÍË³ö");
+    char choose=0;
+    while(1){
+        fflush(stdin);
+        choose = getch();
+        fflush(stdin);
+        switch(choose){
+            case '1':
+                node->position = 1;
+                break;
+            case '2':
+                node->position = 2;
+                break;
+            case '3':
+                node->position = 3;
+                break;
+            case '4':
+                node->position = 4;
+                break;
+            case 27:
+                flag_come_back = 1;
+                return 0;
+            case '*':
+                return 0;
+            default:
+                continue;
+        }
+        ClearArr_int(node->orders, 200, 0);
+        return 1;
+    }
+}
+
+STAFF* STAFFadd(STAFF *head){
+    STAFF *p = (STAFF *)malloc(sizeof(VIP));
+    STAFF__init__(p);
+    STAFF *cur = head;
+    if (cur != NULL) {
+        while(cur->next!=NULL)
+            cur = cur->next;
+    }
+    p->loss = 0; //Ä¬ÈÏÃ»ÓÐ¹ÒÊ§
+    while(1)
+    {// Ãû×Ö²¿·Ö
+        /*name space*/
+        if(flag_come_back||auto_back||Register_Name(p)==0){
+            if(auto_back){//autobackµÄÊ±ºòÒªbreakÖ´ÐÐºóÃæµÄ
+                auto_back = 0;
+                break;
+            }
+            else{
+                return head;//*&ESCÖ±½Ó»ØÈ¥¾ÍºÃ
+            }
+        }
+
+        while(1)// µç»°²¿·Ö
+        {
+            if(flag_come_back||auto_back||Register_tel(p,head)==0)
+                break;
+            while(1)// ÃÜÂë²¿·Ö
+            {
+                if(flag_come_back||auto_back||Register_password(p)==0)
+                    break;
+                while(1){// ³äÖµ²¿·Ö
+                    if(flag_come_back||auto_back||STAFFmoney(p)==0)
+                        break;
+                    while(1){
+                        if(flag_come_back||auto_back||STAFFPosition(p)==0)
+                            break;
+                        Operationok(1);
+                        auto_back = 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    //id ²¿·Ö
+    struct tm *NowTime = GetNowTime();
+    p->id.year = NowTime->tm_year+1900;
+    p->id.month = NowTime->tm_mon+1;
+    p->id.day = NowTime->tm_mday;
+    p->id.hour = NowTime->tm_hour+8;
+    p->id.min = NowTime->tm_min;
+    sprintf(p->id.id, "%04d%02d%02d%02d%02d\0",// ´¦ÀíIdvip½á¹¹ÌåÖÐid×Ö·ûÊý×é²¿·Ö
+            p->id.year, p->id.month, p->id.day, p->id.hour, p->id.min);
+    auto_back = 0;
+    if(flag_come_back){//Èç¹ûÁ¬Ðø»ØÍË¾Í²»ÓÃ±£´æ
+        free(p);
+        return head;
+    }
+    if(cur==NULL)
+        return p;
+    else{
+        cur->next = p;
+        return head;
+    }
+}
+
+int STAFFmoney(VIP *node){
+    system("cls");
+    int attation = 0;
+    while(1)
+    {
+        char temp[100] = {0};
+        char money[100] = {0};
+        toxy(48, 9);
+        printf("°´ * ·µ»Ø£¡°´ ESC ·µ»ØÖ÷²Ëµ¥");
+        toxy(48, 10);
+        strcpy(temp, "ÇëÊäÈëÔ±¹¤¹¤×Ê£º");
+        printf("%s", temp);
+        int lentel = strlen(temp);
+        if(attation)
+            color(4);
+        toxy(48, 11);
+        printf("×¢Òâ£¡");
+        toxy(48, 12);
+        printf("²»µÃ¶àÓÚ20¸ö×Ö·û");
+        toxy(48, 13);
+        printf("½ö¿ÉÊäÈë½ð¶î");
+        toxy(48, 14);
+        if(attation){
+            color(17);
+            printf("ÇëÖØÊÔ£¡");
+        }
+        toxy(48 + lentel + 1, 10);
+        char c=1;
+        int i = 0;
+        while (c)
+        {
+            fflush(stdin);
+            c = getch();//²»»ØÏÔº¯Êý
+            fflush(stdin);
+            if(c<0){//ÅÅ³ýÉÏÏÂ·½Ïò¼üµÄÎÊÌâ
+                continue;
+            }
+
+            if (c == '*')
+            {
+                fflush(stdin);
+                system("cls");
+                return 0;
+            }//ÔÚgetchÖÐ»Ø³µ»á±»¶Á³É\r
+            else if (c == '\r'){
+                if(money[0]==0){
+                    fflush(stdin);
+                    continue;
+                }
+                fflush(stdin);
+                break;
+            }
+            else if (c == 27)
+            {
+                system("cls");
+                fflush(stdin);
+                flag_come_back = 1;
+                return 0;
+            }
+            else if(c>31){
+                if(i<20){
+                    money[i++] = c;
+                    printf("%c",c);
+                }
+            }
+            else if(c=='\b')
+            {
+                if(i>0){
+                    money[--i] = 0;
+                    printf("\b \b");
+                }
+            }
+        }
+        if(VIPCheck_money(money))
+        {
+            node->restmoney = (float)atof(money);
+            system("cls");
+            return 1;
+        }
+        else
+        {
+            attation = 1;
+            system("cls");
+            continue;
+        }
+    }
+}
+
+int STAFFShowList(STAFF *head){
+    system("cls");
+    STAFF *cur = head;
+    if(cur == NULL){
+        printf("ÔÝÎÞÔ±¹¤ÐÅÏ¢");
+        return 0;
+    }
+    int index = 1;
+    while(cur!=NULL){
+        printf("ÐòºÅ£º%d  ÉÏ¸ÚÊ±¼ä£º%04d-%02d-%02d %02d:%02d:%02d  ÐÕÃû£º%-20s  ÊÖ»úºÅ£º%-20s  ÃÜÂë£º*****  ¹¤×Ê£º%-10.2f  Ö°Î»£º", index, cur->id.year,cur->id.month,cur->id.day,cur->id.hour,cur->id.day,cur->id.min, cur->name, cur->tel,cur->restmoney);
+        switch(cur->position){
+            case 1:
+                printf("·þÎñÔ±\n");
+                break;
+            case 2:
+                printf("µê³¤\n");
+                break;
+            case 3:
+                printf("Çå½à¹¤\n");
+                break;
+            case 4:
+                printf("ÊµÏ°Éú\n");
+                break;
+        }
+        index++;
+        cur = cur->next;
+    }
+    return index - 1;
+}
+
+void STAFFadminoperation(){
+    int money = 0, time = 0;
+    while(1){
+        system("cls");//´òÓ¡½çÃæ
+        STAFFShowList(head_staff);
+        printf("\n\n\n");
+        printf("1.Ôö¼ÓÔ±¹¤ 2.×¢ÏúÔ±¹¤ 3.ÐÞ¸Ä/²é¿´Ô±¹¤ÏêÏ¸ÐÅÏ¢ 4.Ê±¼äÅÅÐò 5.¹¤×ÊÅÅÐò ESC.·µ»ØÖ÷²Ëµ¥ *·µ»Ø\n");
+        while(1){//ÊäÈë¹ÜÀí
+            int choose = 0;
+            fflush(stdin);
+            choose = getch();
+            fflush(stdin);
+            switch(choose){
+                case '1':
+                    system("cls");
+                    head_staff = STAFFadd(head_staff);
+                    if(flag_come_back){
+                        return;
+                    }
+                    break;
+                case '2':
+                    STAFFdetele(head_staff);
+                    break;
+                case '3':
+                    ModandShowstaffDetail(head_staff,1); //ÐÞ¸Ä/²é¿´Ô±¹¤ÏêÏ¸ÐÅÏ¢
+                    break;
+                case '4':
+                    F_order_char(time^=1);
+                    break;
+                case '5':
+                    F_order_float(money^=1);
+                    break;
+                case 27:
+                    flag_come_back = 1;
+                    return;
+                case '*':
+                    //·µ»Ø
+                    return;
+                default:
+                    continue;
+            }
+            break;
+        }
+        if(flag_come_back){
+            return;
+        }
+    }
+}
+
+void STAFFdetele(STAFF *head){
+    int error = 0;
+    int number = 0;
+    char number_char[100] = {0}, index_char[100] = {0}, temp = 0;
+    int i = 0, overinput = 0;
+    while(1){//ÊäÈë±àºÅ
+        i = 0;
+        system("cls");
+        number = STAFFShowList(head);
+        printf("\n\n");
+        if(error){
+            error = 0;
+            color(4);
+            printf("\nÇëÊäÈëÕýÈ·µÄ±àºÅ(*·µ»Ø£¬ESC·µ»ØÖ÷²Ëµ¥)\n");
+            color(17);
+        }
+        printf("ÇëÊäÈëÒª×¢ÏúÔ±¹¤µÄ±àºÅ£º£¨*·µ»Ø ESC·µ»ØÖ÷²Ëµ¥£©");
+        while(1){
+            fflush(stdin);
+            temp = getch();
+            fflush(stdin);
+            switch(temp){
+                case 27:
+                    flag_come_back = 1;
+                    return;
+                case '*':
+                    return;
+                case '\r':
+                    overinput = 1;
+                    break;
+                case '\b':
+                    if(i>0){
+                        printf("\b \b");
+                        index_char[--i] = 0;
+                    }
+                    break;
+                default:
+                    if(temp<='9'&&temp>='0'){
+                        if(i<=10){
+                            index_char[i++] = temp;
+                            printf("%c", temp);
+                            break;
+                        }
+                    }
+            }
+            if(overinput == 1){
+                overinput = 0;
+                break;
+            }
+        }
+        int index = C_INTtransf(index_char);
+        ClearArr_char(index_char, 100, 0);
+        if (index > number||index == 0)
+        {
+            error = 1;
+        }
+        else{//È·ÈÏ£¿
+            printf("\nÈ·¶¨Òª×¢ÏúÐòºÅÎª%dµÄÔ±¹¤£¿£¨Y/N£©", index);
+            char confrim = 0;
+            int flag_back = 0;
+            while(1){
+                fflush(stdin);
+                confrim = getch();
+                fflush(stdin);
+                switch(confrim){
+                    case 'Y'://Ö´ÐÐÉ¾³ý
+                        head = Exedelete(head,index);
+                        flag_back = 1;
+                        Operationok(1);
+                        break;
+                    case 'N':
+                        flag_back = 1;
+                        break;
+                    default:
+                        continue;
+                }
+                if(flag_back){
+                    flag_back = 0;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void ModandShowstaffDetail(STAFF *head, int version){
+    int error = 0;
+    int number = 0;
+    char number_char[100] = {0}, index_char[100] = {0}, temp = 0;
+    int i = 0, overinput = 0;
+    while(1){//ÊäÈë±àºÅ
+        i = 0;
+        system("cls");
+        number = STAFFShowList(head);
+        printf("\n\n");
+        if(error){
+            error = 0;
+            color(4);
+            printf("\nÇëÊäÈëÕýÈ·µÄ±àºÅ(*·µ»Ø£¬ESC·µ»ØÖ÷²Ëµ¥)\n");
+            color(17);
+        }
+        printf("ÇëÊäÈëÒªÐÞ¸Ä²é¿´Ô±¹¤µÄ±àºÅ£º£¨*·µ»Ø ESC·µ»ØÖ÷²Ëµ¥£©");
+        while(1){
+            fflush(stdin);
+            temp = getch();
+            fflush(stdin);
+            switch(temp){
+                case 27:
+                    flag_come_back = 1;
+                    return;
+                case '*':
+                    return;
+                case '\r':
+                    overinput = 1;
+                    break;
+                case '\b':
+                    if(i>0){
+                        printf("\b \b");
+                        index_char[--i] = 0;
+                    }
+                    break;
+                default:
+                    if(temp<='9'&&temp>='0'){
+                        if(i<=10){
+                            index_char[i++] = temp;
+                            printf("%c", temp);
+                            break;
+                        }
+                    }
+            }
+            if(overinput == 1){
+                overinput = 0;
+                break;
+            }
+
+        }
+        float index = atof(index_char);
+        ClearArr_char(index_char, 100, 0);
+        if (index > number||index == 0)
+        {
+            error = 1;
+            continue;
+        }
+        while(1){
+            char choose = 0;
+            STAFF *node = Find_Vip(head, index);
+            ShowSTAFFadmin(node);
+            if(node->position==1){
+                printf("\n\n1.ÐÞ¸ÄÃÜÂë 2.ÐÞ¸ÄÊÖ»úºÅ 3.ÐÞ¸ÄÖ°Î» 4.²é¿´Òµ¼¨ *·µ»Ø ESC·µ»ØÖ÷²Ëµ¥");
+                color(4);
+                printf("\n×¢Òâ£ºÐÞ¸ÄÖ°Î»»áÉ¾³ýÔ±¹¤Òµ¼¨Çë½÷É÷Ñ¡Ôñ");
+                color(17);
+            }
+            else{
+                printf("\n\n1.ÐÞ¸ÄÃÜÂë 2.ÐÞ¸ÄÊÖ»úºÅ 3.ÐÞ¸ÄÖ°Î» *·µ»Ø ESC·µ»ØÖ÷²Ëµ¥");
+            }
+            int flag_back = 0;
+            while(1){// ÊäÈë
+                fflush(stdin);
+                choose = getch();
+                fflush(stdin);
+                switch(choose){
+                    case '1' :
+                        system("cls");
+                        if(Register_password(node))
+                            Operationok(1);
+                        break;
+                    case '2':
+                        system("cls");
+                        if(Register_tel(node,head))
+                            Operationok(1);
+                        break;
+                    case '3':
+                        system("cls");
+                        if(version==1){
+                            STAFFPosition(node);
+                        }
+                        else{
+                            system("cls");
+                            printf("±§Ç¸£¡ÄãÎÞÈ¨ÏÞ");
+                        }
+                        break;
+                    case '*':
+                        flag_back = 1;
+                        break;
+                    case 27:
+                        flag_come_back = 1;
+                        return;
+                    default:
+                        if(choose == '4'){
+                            ConsumeRecord(node, head_form);
+                            break;
+                        }
+                        else{
+                            continue;
+                        }
+                }
+                break;
+            }
+            if(flag_back){
+                flag_back = 0;
+                break;
+            }
+            if(flag_come_back){
+                return;
+            }
+        }
+    }
+}
+
+void ShowSTAFFadmin(STAFF *node){
+    system("cls");
+    printf("×¢²áÊ±¼ä£º%04d-%02d-%02d %02d:%02d\nÐÕÃû£º%s\nµç»°£º%s\nÃÜÂë£º%s\n¹¤×Ê£º%.2f\nÖ°Î»£º",
+           node->id.year + 1900, node->id.month + 1, node->id.day, node->id.hour + 8, node->id.min,
+           node->name, node->tel, node->password, node->restmoney);
+    switch(node->position){
+        case 1:
+            printf("·þÎñÔ±\n");
+            break;
+        case 2:
+            printf("µê³¤\n");
+            break;
+        case 3:
+            printf("Çå½à¹¤\n");
+            break;
+        case 4:
+            printf("ÊµÏ°Éú\n");
+            break;
+    }
+}
+
+void STAFFUSERshow(VIP *node){
+    if(node==NULL)
+        return;
+    system("cls");
+    printf("¹¤ºÅ£º%s\nÐÕÃû£º%s\nµç»°£º%s\n¹¤×Ê£º%.2f\nÃÜÂë£º******\nÖ°Î»£º", node->id.id,node->name ,node->tel, node->restmoney);
+    switch (node->position)
+    {
+        case 1:
+            printf("·þÎñÔ±\n");
+            break;
+        case 2:
+            printf("µê³¤\n");
+            break;
+        case 3:
+            printf("Çå½à¹¤\n");
+            break;
+        case 4:
+            printf("ÊµÏ°Éú\n");
+            break;
+        default:
+            break;
+    }
+    if(node->position==1){
+        printf("\nÇëÊäÈë²Ù×÷£º1. ÐÞ¸ÄµÇÂ¼ÃÜÂë 2.ÐÞ¸ÄÊÖ»úºÅ 3. ²é¿´Òµ¼¨ 4.µã²Í 5.»áÔ±×¢²á 6.»áÔ±µÇÂ¼ *·µ»Ø ESC.ÍË³öµÇÂ¼\n");
+    }
+    else{
+        printf("\nÇëÊäÈë²Ù×÷£º1. ÐÞ¸ÄµÇÂ¼ÃÜÂë 2.ÐÞ¸ÄÊÖ»úºÅ *·µ»Ø ESC.ÍË³öµÇÂ¼\n");
+    }
+}
+
+//user»áÔ±²Ù×÷
+void STAFFoperationUSER(STAFF *node){
+    char operation = 0;
+    if(node==NULL)
+        return;
+    while(1){
+        STAFFUSERshow(node);
+        fflush(stdin);
+        operation = getch();
+        fflush(stdin);
+        switch(operation){
+            case 27:
+                flag_come_back = 1;
+                return;
+            case '1':
+                system("cls");
+                if(Register_password(node)){
+                    Operationok(1);
+                }
+                break;
+            case '2':
+                system("cls");
+                if(Register_tel(node,head_staff)){
+                    Operationok(1);
+                }
+                break;
+            case '*':
+                return;
+            default:
+                //Ô±¹¤ÊÇ·þÎñÔ±£¬²¢ÇÒ
+                if(operation=='4'&&node->position==1){
+                    //Ñ¡ÔñÊÇ·ñÊÇ»áÔ±
+                    while(1){
+                        system("cls");
+                        node_STAFF = node;
+                        printf("µã²Í¹Ë¿ÍÊÇ»áÔ±Âð£¿£¨Y/N£©*·µ»Ø ESC·µ»ØÖ÷²Ëµ¥");
+                        VIP *result = NULL;//result 0 µÇÂ¼Ê§°Ü node³É¹¦
+                        int YN = inputYorN();
+                        if(YN == -1)
+                            break;
+                        if(YN){//ÊÇ·ñ»áÔ±
+                            result = VIPlogin(head_vip);
+                            if(!result){
+                                continue;
+                            }
+                            else{
+                                node_VIP = result;
+                            }
+                        }
+                        Order();
+                        break;
+                    }
+                }
+                if(operation=='3'&&node->position==1){
+                    ConsumeRecord(node, head_form);
+                }
+                if(operation=='5'&&node->position==1){
+                    system("cls");
+                    head_vip = VIPRegister(head_vip);
+                }
+                if(operation=='6'&&node->position==1){
+                    VIP *temp_node=VIPlogin(head_vip);
+                    VIPoperationUSER(temp_node);
+                }
+                break;
+        }
+        if(flag_come_back){
+            flag_come_back = 1;
+            return;
+        }
+    }
+}
+//Y·µ»Ø1N·µ»Ø0ESC·µ»Ø-1
+int inputYorN(){
+    char choose = 0;
+    while(1){
+        choose = getch();
+        switch(choose){
+            case 'Y':
+                return 1;
+            case 'N':
+                return 0;
+            case '*':
+                return -1;
+            case 27:
+                flag_come_back = 1;
+                return -1;
+            default:
+                continue;
+        }
+    }
+}
+
+//¶ÔVIPµÄID£¨Ê±¼ä£©½øÐÐÅÅÐò 1ÕýÐò 0µ¹Ðò
+void V_order_char(int version){
+    VIP *p = (VIP *)malloc(sizeof(VIP));
+    p->next = head_vip;
+    head_vip = p;//ÉÚ±ø½áµã
+    if(head_vip==NULL)
+        return;
+    VIP *cur = head_vip->next, *last = head_vip->next->next,*pre = head_vip;
+    if(version == 1){
+        int flag = 1;
+        while(flag){
+            flag = 0;
+            cur = head_vip->next;
+            last = head_vip->next->next;
+            pre = head_vip;
+            while(last!=NULL){
+                if(strcmp(cur->id.id,last->id.id)>0){
+                    VIP *temp;
+                    flag = 1;
+                    cur->next = last->next;
+                    last->next = cur;
+                    pre->next = last;
+                    temp = cur;
+                    cur = last;
+                    last = temp;
+                }
+                pre = cur;
+                cur = last;
+                last = last->next;
+            }
+        }
+    }
+
+    else{
+        int flag = 1;
+        while(flag){
+            flag = 0;
+            cur = head_vip->next;
+            last = head_vip->next->next;
+            pre = head_vip;
+            while(last!=NULL){
+                if(strcmp(cur->id.id,last->id.id)<0){
+                    VIP *temp;
+                    flag = 1;
+                    cur->next = last->next;
+                    last->next = cur;
+                    pre->next = last;
+                    temp = cur;
+                    cur = last;
+                    last = temp;
+                }
+                pre = cur;
+                cur = last;
+                last = last->next;
+            }
+        }
+    }
+    printf("ExplicitFlag");
+    p = head_vip;
+    head_vip = head_vip->next;
+    free(p);
+}
+//¶ÔVIPµÄÓà¶î½øÐÐÅÅÐò 1ÕýÐò 0µ¹Ðò
+void V_order_float(int version){
+    VIP *p = (VIP *)malloc(sizeof(VIP));
+    p->next = head_vip;
+    head_vip = p;//ÉÚ±ø½áµã
+    if(head_vip==NULL)
+        return;
+    VIP *cur = head_vip->next, *last = head_vip->next->next,*pre = head_vip;
+    if(version == 1){
+        int flag = 1;
+        while(flag){
+            flag = 0;
+            cur = head_vip->next;
+            last = head_vip->next->next;
+            pre = head_vip;
+            while(last!=NULL){
+                if(cur->restmoney>last->restmoney){
+                    VIP *temp;
+                    flag = 1;
+                    cur->next = last->next;
+                    last->next = cur;
+                    pre->next = last;
+                    temp = cur;
+                    cur = last;
+                    last = temp;
+                }
+                pre = cur;
+                cur = last;
+                last = last->next;
+            }
+        }
+    }
+
+    else{
+        int flag = 1;
+        while(flag){
+            flag = 0;
+            cur = head_vip->next;
+            last = head_vip->next->next;
+            pre = head_vip;
+            while(last!=NULL){
+                if(cur->restmoney<last->restmoney){
+                    VIP *temp;
+                    flag = 1;
+                    cur->next = last->next;
+                    last->next = cur;
+                    pre->next = last;
+                    temp = cur;
+                    cur = last;
+                    last = temp;
+                }
+                pre = cur;
+                cur = last;
+                last = last->next;
+            }
+        }
+    }
+    p = head_vip;
+    head_vip = head_vip->next;
+    free(p);
+}
+
+//¶ÔstaffµÄID£¨Ê±¼ä£©½øÐÐÅÅÐò 1ÕýÐò 0µ¹Ðò
+void F_order_char(int version){
+    VIP *p = (VIP *)malloc(sizeof(VIP));
+    p->next = head_staff;
+    head_staff = p;//ÉÚ±ø½áµã
+    if(head_staff==NULL)
+        return;
+    VIP *cur = head_staff->next, *last = head_staff->next->next,*pre = head_staff;
+    if(version == 1){
+        int flag = 1;
+        while(flag){
+            flag = 0;
+            cur = head_staff->next;
+            last = head_staff->next->next;
+            pre = head_staff;
+            while(last!=NULL){
+                if(strcmp(cur->id.id,last->id.id)>0){
+                    VIP *temp;
+                    flag = 1;
+                    cur->next = last->next;
+                    last->next = cur;
+                    pre->next = last;
+                    temp = cur;
+                    cur = last;
+                    last = temp;
+                }
+                pre = cur;
+                cur = last;
+                last = last->next;
+            }
+        }
+    }
+
+    else{
+        int flag = 1;
+        while(flag){
+            flag = 0;
+            cur = head_staff->next;
+            last = head_staff->next->next;
+            pre = head_staff;
+            while(last!=NULL){
+                if(strcmp(cur->id.id,last->id.id)<0){
+                    VIP *temp;
+                    flag = 1;
+                    cur->next = last->next;
+                    last->next = cur;
+                    pre->next = last;
+                    temp = cur;
+                    cur = last;
+                    last = temp;
+                }
+                pre = cur;
+                cur = last;
+                last = last->next;
+            }
+        }
+    }
+    printf("ExplicitFlag");
+    p = head_staff;
+    head_staff = head_staff->next;
+    free(p);
+}
+
+//¶ÔstaffµÄ¹¤×Ê½øÐÐÅÅÐò 1ÕýÐò 0µ¹Ðò
+void F_order_float(int version){
+    VIP *p = (VIP *)malloc(sizeof(VIP));
+    p->next = head_staff;
+    head_staff = p;//ÉÚ±ø½áµã
+    if(head_staff==NULL)
+        return;
+    VIP *cur = head_staff->next, *last = head_staff->next->next,*pre = head_staff;
+    if(version == 1){
+        int flag = 1;
+        while(flag){
+            flag = 0;
+            cur = head_staff->next;
+            last = head_staff->next->next;
+            pre = head_staff;
+            while(last!=NULL){
+                if(cur->restmoney>last->restmoney){
+                    VIP *temp;
+                    flag = 1;
+                    cur->next = last->next;
+                    last->next = cur;
+                    pre->next = last;
+                    temp = cur;
+                    cur = last;
+                    last = temp;
+                }
+                pre = cur;
+                cur = last;
+                last = last->next;
+            }
+        }
+    }
+
+    else{
+        int flag = 1;
+        while(flag){
+            flag = 0;
+            cur = head_staff->next;
+            last = head_staff->next->next;
+            pre = head_staff;
+            while(last!=NULL){
+                if(cur->restmoney<last->restmoney){
+                    VIP *temp;
+                    flag = 1;
+                    cur->next = last->next;
+                    last->next = cur;
+                    pre->next = last;
+                    temp = cur;
+                    cur = last;
+                    last = temp;
+                }
+                pre = cur;
+                cur = last;
+                last = last->next;
+            }
+        }
+    }
+    p = head_staff;
+    head_staff = head_staff->next;
+    free(p);
+}
+
+void Add_VIPOrders(VIP *node,Complete_Form * cf){
+    int len=0;
+    for (; node->orders[len];len++);
+    node->orders[len] = cf->id.id;
+}
 
 void Inventory_Manage()  //¿â´æ¹ÜÀíÒ³Ãæ
 {
@@ -850,6 +3447,7 @@ void Inventory_Manage()  //¿â´æ¹ÜÀíÒ³Ãæ
     char t;  //´æ´¢ÓÃ»§Ñ¡Ôñ
     toxy(12,6);
     printf("ÇëÑ¡ÔñÐèÒª½øÐÐµÄ²Ù×÷:\n");
+    printf("\t\t°´ÏÂesc¼ü·µ»ØÖ÷Ò³Ãæ\n");
     printf("\t\t1.Ôö¼Ó¿â´æ\n");
     printf("\t\t2.²é¿´¿â´æÏûºÄ\n");
     printf("\t\t0.·µ»ØÉÏÒ»¼¶");
@@ -864,9 +3462,12 @@ void Inventory_Manage()  //¿â´æ¹ÜÀíÒ³Ãæ
         case '2':
             Show_InventoryConsumption();
             break;
-            // case '0':
-
-            //     break;
+        case '0':
+            ROOT();
+            break;
+        case 27:
+            Default();
+            break;
         default:
             printf("\t\tÊäÈë²»ºÏ¹æ£¬ÇëÖØÐÂÊäÈë");  //µÝ¹éÖ±ÖÁÊäÈëºÏ¹æ
             Inventory_Manage();
@@ -939,6 +3540,7 @@ void Show_InventoryConsumption()  //²é¿´¿â´æÏûºÄ
     toxy(12,6);
     HideCursor(0);
     printf("ÇëÑ¡Ôñ²é¿´¿â´æÏûºÄµÄ¹Ø¼ü´Ê:\n");
+    printf("\t\t°´ÏÂesc¼ü·µ»ØÖ÷Ò³Ãæ\n");
     printf("\t\t1.°´ÏûºÄÁ¿½øÐÐÅÅÐò\n");
     printf("\t\t2.°´Ô­²ÄÁÏid½øÐÐÅÅÐò\n");
     printf("\t\t0.·µ»ØÉÏÒ»¼¶\n");
@@ -957,6 +3559,9 @@ void Show_InventoryConsumption()  //²é¿´¿â´æÏûºÄ
         case '0':
             Inventory_Manage();
             return;
+        case 27:
+            Default();
+            return;
         default:
             printf("\t\tÊäÈë²»ºÏ¹æ£¬ÇëÖØÐÂÊäÈë");
             Show_InventoryConsumption(); //µÝ¹éÖ±ÖÁÊäÈëºÏ¹æ
@@ -971,6 +3576,7 @@ void Inventory_GetAdded(Material *m)  //ÓÃ»§Ñ¡ÔñÌí¼ÓµÄÁ¿£¬·µ»ØÓÃ»§µÄÑ¡Ôñ(1---1kg
     system("cls");
     toxy(12,6);
     printf("ÇëÑ¡ÔñÌí¼ÓµÄÁ¿:\n");
+    printf("\t\t°´ÏÂesc¼ü·µ»ØÖ÷Ò³Ãæ\n");
     printf("\t\t1.Ìí¼ÓÖÁÒ»°ë(5kg)\n");
     printf("\t\t2.Ìí¼ÓÖÁÂú(10kg)\n");
     printf("\t\t0.·µ»ØÉÏÒ»¼¶\n");
@@ -991,6 +3597,9 @@ void Inventory_GetAdded(Material *m)  //ÓÃ»§Ñ¡ÔñÌí¼ÓµÄÁ¿£¬·µ»ØÓÃ»§µÄÑ¡Ôñ(1---1kg
             break;
         case '0':
             Add_Inventory();
+            return;
+        case 27:
+            Default();
             return;
         default:
             printf("\t\tÊäÈë²»ºÏ¹æ£¬ÇëÖØÐÂÊäÈë");
@@ -1254,7 +3863,7 @@ void ShowMonthSales(int a)
 
 void ShowSeasonSales(int a)
 {
-    int b[3];
+    char b[3];
     switch(a)
     {
         case 1:strcat(b,"´º¼¾");break;
@@ -1329,7 +3938,7 @@ void Check_Month_Sales()//¶ÁÈ¡head_formÁ´±íÀïÃæµÄ½áµãÀïµÄÊý¾Ý¡£Êý×é±£´æÏàÓ¦IDµÄÏ
 
         if(strcmp(a,"0")==0)
         {
-            main();
+            ShowSale();
         }
 
         b=Check_Number(a,12,2);
@@ -1338,7 +3947,7 @@ void Check_Month_Sales()//¶ÁÈ¡head_formÁ´±íÀïÃæµÄ½áµãÀïµÄÊý¾Ý¡£Êý×é±£´æÏàÓ¦IDµÄÏ
         if(b==-1||b==-2)
         {
             printf("ÇëÊäÈëÊý×Ö0-12£¡\n");
-            sleep(2);
+            Sleep(2);
             system("CLS");
             Check_Month_Sales();
         }
@@ -1401,7 +4010,7 @@ void Check_Season_Sales()
 
         if(strcmp(a,"0")==0)
         {
-            main();
+            ShowSale();
         }
 
         b=Check_Number(a,4,1);
@@ -1410,7 +4019,7 @@ void Check_Season_Sales()
         if(b==-1||b==-2)
         {
             printf("ÇëÊäÈëÊý×Ö0-4£¡\n");
-            sleep(3);
+            Sleep(3);
             system("CLS");
 
             Check_Season_Sales();
@@ -1472,7 +4081,7 @@ void Check_Year_Sales()
 
         if(strcmp(a,"0")==0)
         {
-            main();
+            ShowSale();
         }
 
         b=Check_Number(a,1,1);
@@ -1481,7 +4090,7 @@ void Check_Year_Sales()
         if(b==-1||b==-2)
         {
             printf("ÇëÊäÈëÊý×Ö0-1£¡\n");//·¢ÏÖÒ»¸öbug£¬ÊäÈë´íÎóÖ®ºóÒª°´Á½ÏÂÒÔÉÏ0²Å¿ÉÒÔÍË³ö¡£
-            sleep(2);
+            Sleep(2);
             system("CLS");
             Check_Year_Sales();//ËüÊÇµ÷ÓÃÁËÖ®ºóreturnµ½ÉÏÒ»¸öCheck_Year_Sales()
         }
@@ -1839,18 +4448,167 @@ void ManageGoods()
     }
 }
 
-int main()
-{
+void Default(){
+    while(1){
+        flag_come_back = 0;
+        if(ExplicitFlag){
+            system("cls");
+            printf("ÄãºÃÑ½´óÉµ±Æ£¬»¶Ó­À´µ½Ê±ÉÐÅÝ°É\n");
+            printf("1.¹ÜÀíÔ±¹öÕâÀï 2.»áÔ±µÇÂ¼ 3.»áÔ±×¢²á 4.·Ç»áÔ±µã²Í 5.µù ESC.ÍË³ö");
+        }
+        char choose = 0;
+        VIP *node_main;
+        fflush(stdin);
+        choose = getch();
+        fflush(stdin);
+        switch(choose){
+            case '1':
+                system("cls");
+                node_main = VIPlogin(head_staff);
+                STAFFoperationUSER(node_main);
+                break;
+            case '2':
+                system("cls");
+                node_main = VIPlogin(head_vip);
+                VIPoperationUSER(node_main);
+                break;
+            case '3':
+                system("cls");
+                head_vip = VIPRegister(head_vip);
+                break;
+            case '4':
+                system("cls");
+                Order();
+                break;
+            case '5':
+                ROOT();
+                break;
+            case 27:
+                return;
+            default:
+                ExplicitFlag = 0;
+                Default();
+                ExplicitFlag = 1;
+                return;
+        }
+    }
+}
+
+void ROOT(){
+    if(RootLogin()==0){
+        return;
+    }
+    while(1){
+        system("cls");
+        if(flag_come_back)
+            return;
+        char choose = 0;
+        printf("µù ÄãÀ´À²£¡");
+        printf("\n1.Ô±¹¤¹ÜÀí 2.¿â´æ¹ÜÀí 3.ÉÌÆ·¹ÜÀí 4.ÒµÎñ¹ÜÀí 5.»áÔ±¹ÜÀí");
+        choose = getch();
+        switch(choose){
+            case '1':
+                system("cls");
+                STAFFadminoperation();
+                break;
+            case '2':
+                system("cls");
+                Inventory_Manage();
+                break;
+            case '3':
+                system("cls");
+                ManageGoods();
+                break;
+            case '4':
+                system("cls");
+                ShowSale();
+                break;
+            case '5':
+                system("cls");
+                VIPadminoperation();
+                break;
+            case 27:
+                return;
+        }
+    }
+}
+
+
+
+int RootLogin(){
+    int error = 0;
+    while(1){
+        system("cls");
+        char temp_password[21]={0};
+        int count = 0;
+        int over = 0;
+        char word=0;
+        char temp[100] = "ÇëÊäÈëÃÜÂëÎÒµÄ´óµù(ESC·µ»ØÖ÷²Ëµ¥ *·µ»Ø)£º";
+
+        printf("ÇëÊäÈëÃÜÂëÎÒµÄ´óµù(ESC·µ»ØÖ÷²Ëµ¥ *·µ»Ø)£º");
+        if(error){
+            color(4);
+            printf("\nÃÜÂë´íÎó!!");
+            color(17);
+            error = 0;
+        }
+        toxy(strlen(temp),0 );
+        while(1){
+            word = getch();
+            switch(word){
+                case 27:
+                    flag_come_back = 1;
+                    return 0;
+                case '*':
+                    flag_come_back = 1;
+                    return 0;
+                case '\b':
+                    if(count>0){
+                        temp_password[--count] = 0;
+                        printf("\b \b");
+                    }
+                    break;
+                case '\r':
+                    over = 1;
+                    break;
+                default:
+                    if(word>31){
+                        printf("%c", word);
+                        temp_password[count++] = word;
+                    }
+            }
+            if(over)
+                break;
+        }
+        if(strcmp(bosspassword,temp_password)==0){
+            return 1;
+        }
+        else{
+            error = 1;
+        }
+    }
+}
+
+void INIT(){
     setbuf(stdout,NULL);
     head_beverage = Create_BeverageLinkList();
     head_form = Create_FormLinkList();
     head_material = Create_MaterialLinkList();
-//    Order();
-//    ShowSale();
-//    Inventory_Manage();
-//    ManageGoods()
-    Rewrite_BeverageData();
-    Rewrite_FormData();
-    Rewrite_MaterialData();
+    head_staff = STAFFReadFile();
+    head_vip = VIPReadFile();
+}
+
+void SAVE(){
+    VIPInputFile(head_vip);
+    STAFFInputFile(head_staff);
+}
+
+
+int main()
+{
+    INIT();
+    Default();
+    SAVE();
+    system("pause");
     return 0;
 }
