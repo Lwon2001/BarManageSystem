@@ -1,6 +1,3 @@
-//
-// Created by tangwenxin on 2021/5/3.
-//
 #include<stdio.h>
 #include<stdlib.h>
 #include<malloc.h>
@@ -10,6 +7,7 @@
 #include<string.h>
 #include<math.h>
 
+
 /* ºê¶¨Òå */
 #define Max_Form_Num 20  //Ã¿Ò»¸öÍêÕû¶©µ¥ÖĞµÄ×î´ó±­Êı
 #define Max_User_Enter 1000  //ÓÃ»§ÊäÈëµÄ×î´ó×Ö·û´®³¤¶È
@@ -18,11 +16,14 @@
 #define Normal_Type setColor(4, 15);//°×µ×ºì×Ö
 #define Warning_Type setColor(2, 15);//°×µ×ÂÌ×Ö
 #define Normal_Color "color f4"
+#define X_COORD 37  //¶¨ÒåX×ø±ê»ù×¼
 #define Lstrict 30 //ÎÄ×Ö¾à×óÉÏÏŞ
 #define Upstrict 10 //ÎÄ×ÖµÄ¸ß¶ÈÉÏÏŞ
 #define w 3 //ÎÄ×ÖË®Æ½Æ«ÖÃÖµ
+
+
 /* ½á¹¹Ìå */
-//ÒûÆ·(beverage)
+//ÒûÆ·
 typedef struct Beverage
 {
     int id;  //ÒûÆ·¶ÔÓ¦µÄid(´Ó1¿ªÊ¼)
@@ -43,6 +44,16 @@ typedef struct Material
     struct Material* next;
 }Material;
 
+//µ¥¸ö¶©µ¥
+typedef struct Single_Form
+{
+    int beverage;  //ÒûÆ·ÖÖÀà(ÎªÒûÆ·ÖÖÀàµÄid)
+    int ingredients;  //Ğ¡ÁÏ(ingredient)(12345·Ö±ğÎª²¼¶¡,Ò¬¹û,ºì¶¹,ÕäÖé,²»¼Ó)
+    int temperature;  //ÎÂ¶È (1--¼Ó±ù£¬2--³£ÎÂ£¬3--Î¢ÈÈ£¬4--ÌÌ)
+    int drink_place;  //ÒûÓÃµØµã
+    float total_price;  //¶©µ¥×Ü¼Û
+}Single_Form;
+
 //ID
 typedef struct Form_ID  //Ã¿¸öÍêÕû¶©µ¥µÄIDÉèÎªÒ»¸ö½á¹¹Ìå£¬ÀïÃæ°üº¬Ê±¼äĞÅÏ¢£¬·½±ãºóÃæ¼ìË÷ÓëÅÅĞò
 {
@@ -53,16 +64,6 @@ typedef struct Form_ID  //Ã¿¸öÍêÕû¶©µ¥µÄIDÉèÎªÒ»¸ö½á¹¹Ìå£¬ÀïÃæ°üº¬Ê±¼äĞÅÏ¢£¬·½±ã
     int hour;
     int min;
 }Form_ID;
-
-//µ¥¸ö¶©µ¥
-typedef struct Single_Form
-{
-    int beverage;  //ÒûÆ·ÖÖÀà(ÎªÒûÆ·ÖÖÀàµÄid)
-    int ingredients;  //Ğ¡ÁÏ(ingredient)(12345·Ö±ğÎª²¼¶¡,Ò¬¹û,ºì¶¹,ÕäÖé,²»¼Ó)
-    int temperature;  //ÎÂ¶È (1--¼Ó±ù£¬2--³£ÎÂ£¬3--Î¢ÈÈ£¬4--ÌÌ)
-    int drink_place;  //ÒûÓÃµØµã
-    float total_price;  //¶©µ¥×Ü¼Û
-}Single_Form;
 
 //ÍêÕû¶©µ¥
 typedef struct Complete_Form
@@ -76,6 +77,16 @@ typedef struct Complete_Form
     struct Complete_Form *next;
 }Complete_Form;
 
+//Ô­²ÄÁÏµÄÏûºÄÁ¿
+typedef struct Consumption
+{
+    int id;  //¶ÔÓ¦Ô­²ÄÁÏµÄid
+    float consumption;  //×ÜÏûºÄÁ¿
+    char name[20];  //Ô­²ÄÁÏÃû
+    struct Consumption* pre;  //Ç°Çı
+    struct Consumption* next;  //ºó¼Ì
+}Consumption;
+
 //Ã¿¸ö»áÔ±µÄIDÉèÎªÒ»¸ö½á¹¹Ìå£¬ÀïÃæ°üº¬Ê±¼äĞÅÏ¢£¬·½±ãºóÃæ¼ìË÷ÓëÅÅĞò
 typedef struct ID_VIP
 {
@@ -87,8 +98,9 @@ typedef struct ID_VIP
     int min;
 }IDVIP;
 
-//vipµÄ½á¹¹Ìå
-typedef struct vip {
+//»áÔ±
+typedef struct vip
+{
     IDVIP id;
     char name[25];
     char tel[25];
@@ -101,6 +113,7 @@ typedef struct vip {
 }VIP;
 //ÓÉÓÚÔ±¹¤µÄÊı¾İ½á¹¹¸ú»áÔ±ºÜÏàËÆ£¬ËùÒÔÕâÀï¼Ì³ĞÁË»áÔ±µÄÊı¾İ½á¹¹
 typedef struct vip STAFF;
+
 
 /* È«¾Ö±äÁ¿ */
 int Total_Form_Num = 0;   //µ¼Èë¶©µ¥Á´±íÊı¾İµÄÊ±ºò»á½øĞĞ¸üĞÂ¸³Öµ
@@ -120,16 +133,8 @@ int page = 0;
 int index_vip=1;
 int single;
 int rest;
+int RootPasswordFlag = 1;// 1±íÊ¾Root¹ÜÀíÒ³ÃæĞèÒªÊäÈëÃÜÂë½øÈë
 
-//Ô­²ÄÁÏµÄÏûºÄÁ¿
-typedef struct Consumption
-{
-    int id;  //¶ÔÓ¦Ô­²ÄÁÏµÄid
-    float consumption;  //×ÜÏûºÄÁ¿
-    char name[20];  //Ô­²ÄÁÏÃû
-    struct Consumption* pre;  //Ç°Çı
-    struct Consumption* next;  //ºó¼Ì
-}Consumption;
 
 /* È«¾ÖÖ¸Õë±äÁ¿ */
 Beverage* head_beverage;  //ÒûÆ·ÖÖÀàĞÅÏ¢Á´±í
@@ -141,8 +146,10 @@ VIP *head_vip;  //vipĞÅÏ¢Á´±í
 VIP *node_VIP;  //µ±Ç°µãµ¥µÄVIP¶ÔÓ¦µÄ½áµã(Èç¹ûµ±Ç°µãµ¥µÄ·Çvip,Ôò½áµãÖµÎªNULL)
 STAFF *node_STAFF;  //µ±Ç°½øĞĞ²Ù×÷µÄµêÔ±¶ÔÓ¦µÄ½áµã(×ÔÖúµãµ¥Ä£Ê½Ê±¼´ÎŞµêÔ±Ê±ÖµÎªNULL)
 
-//
+
+/* º¯ÊıÉùÃ÷ */
 void Default();  //»¶Ó­½çÃæ
+void ROOT();  //ROOT¹ÜÀíÒ³Ãæ(ÀÏ°å£©
 void INIT();  //³õÊ¼»¯£¬´ÓÎÄ¼şÖĞ¶ÁÈëÊı¾İ´´½¨¸÷ÖÖÁ´±í
 void SAVE();  //±£´æ³ÌĞòÖ´ĞĞ¹ı³ÌÖĞ¶ÔÊı¾İÁ´±íµÄ¸Ä¶¯£¬²¢ÖØĞÂĞ´ÈëÎÄ¼ş
 Complete_Form * Create_FormLinkList();  //´´½¨¶©µ¥ĞÅÏ¢Á´±í(´ÓÎÄ¼şÖĞµ¼ÈëËùÓĞ¶©µ¥ĞÅÏ¢),·µ»ØÖ¸Ïò¸ÃÁ´±íÉÚÎ»½áµãµÄÖ¸Õë
@@ -176,47 +183,33 @@ Consumption* Find_Consumption(int x,Consumption* h);  //ÔÚÔ­²ÄÁÏÏûºÄµÄË«ÏòÁ´±íÖĞ
 void Rewrite_FormData();  //½«¸üĞÂºóµÄ¶©µ¥Á´±íÊı¾İÖØĞÂĞ´»ØÎÄ¼şÖĞ
 void Rewrite_BeverageData();  //½«¸üĞÂºóµÄÒûÆ·Á´±íÊı¾İÖØĞÂĞ´»ØÎÄ¼şÖĞ
 void Rewrite_MaterialData();  //½«¸üĞÂºóµÄÔ­²ÄÁÏÁ´±íÊı¾İÖØĞÂĞ´»ØÎÄ¼şÖĞ
-VIP *VIPReadFile();
-void VIPInputFile(VIP *VIPlisthead);
-void ClearArr_int(int *a, int size, int value);
-void ClearArr_char(char *a, int size, char value);
-void VIP__init__(VIP *node);
-struct tm *GetNowTime();
-int Register_tel(VIP *node,VIP *head);
-int Register_recharge(VIP *node);
-int VIPCheck_money(char *money);
-int C_INTtransf(char *money);
-Complete_Form *Find_Form(int x, Complete_Form *h);
-void ConsumeRecord(VIP *node, Complete_Form *head);
-void Add_VIPOrders(VIP *node, Complete_Form *cf);
-void UnchangeWindowSize();
-int inputYorN();
-void V_order_char(int version);
-void V_order_float(int version);
-void F_order_char(int version);
-void F_order_float(int version);
-int pagef(VIP *head,int begin,int end);//ÊµÏÖ·ÖÒ³¹¦ÄÜ
+VIP *VIPReadFile();  //´ÓÎÄ¼şÖĞ¶ÁÈ¡»áÔ±Êı¾İ
+void VIPInputFile(VIP *VIPlisthead);  //½«»áÔ±Êı¾İĞ´ÈëÎÄ¼ş
+void ClearArr_int(int *a, int size, int value);  //intĞÍÊı×éµÄ³õÊ¼»¯
+void ClearArr_char(char *a, int size, char value);  //charĞÍÊı×éµÄ³õÊ¼»¯
+void VIP__init__(VIP *node);  //VIP½á¹¹ÌåµÄ³õÊ¼»¯º¯Êı
+struct tm *GetNowTime();  //»ñÈ¡µ±Ç°Ê±¼ä
+int Register_tel(VIP *node,VIP *head);  //ÓÃµç»°ºÅÂë½øĞĞ×¢²á»áÔ±»òÔ±¹¤
+int Register_recharge(VIP *node);  //»áÔ±³äÖµ
+int VIPCheck_money(char *money);  //¼ì²âÊäÈë½ğ¶îµÄºÏ·¨ĞÔ
+int C_INTtransf(char *money);  //charÀàĞÍÊı×Ö->intÀàĞÍ
+void ConsumeRecord(VIP *node, Complete_Form *head);  //Õ¹Ê¾»áÔ±Ïû·Ñ¼ÇÂ¼
+void Add_VIPOrders(VIP *node, Complete_Form *cf);  //Ìí¼Ó»áÔ±¶©µ¥
+int inputYorN();  //Y·µ»Ø1N·µ»Ø0ESC·µ»Ø-1
+void V_order_char(int version);  //¶ÔVIPµÄID£¨Ê±¼ä£©½øĞĞÅÅĞò 1ÕıĞò 0µ¹Ğò
+void V_order_float(int version);  //¶ÔVIPµÄÓà¶î½øĞĞÅÅĞò 1ÕıĞò 0µ¹Ğò
+void F_order_char(int version);  //¶ÔstaffµÄID£¨Ê±¼ä£©½øĞĞÅÅĞò 1ÕıĞò 0µ¹Ğò
+void F_order_float(int version);  //¶ÔstaffµÄ¹¤×Ê½øĞĞÅÅĞò 1ÕıĞò 0µ¹Ğò
+int pagef(VIP *head,int begin,int end);  //ÊµÏÖ·ÖÒ³¹¦ÄÜ
 int VIPShowList(VIP *head);  //ÏÔÊ¾ËùÓĞ»áÔ±ĞÅÏ¢£¬·µ»Ø»áÔ±¸öÊı
 void VIPdetele(VIP *head);  //É¾³ı»áÔ±
 VIP *Exedelete(VIP *head, int index);  //»áÔ±É¾³ı²½Öè--Ö´ĞĞ»áÔ±É¾³ı
 void ModandShowDetail(VIP *head);  //VIPadminoperationÖĞÒıÓÃ--ĞŞ¸Ä»áÔ±ĞÅÏ¢
 void ShowVIPadmin(VIP *node);  //ÏÔÊ¾µ¥Ò»»áÔ±ÏêÏ¸ĞÅÏ¢
-VIP *Find_Vip(VIP *head, int index);  //Ñ°ÕÒvip
-/*
-Ô±¹¤ÎÄ¼şµÄ¶ÁÈ¡¸ñÊ½£º
-_index,name,tel,money,password,loss(bool),position,(if(position)=1:orderlist....)
-index,name,tel,money,password,loss(bool),position,(if(position)=1:orderlist....)
-(ÏÂ»®Ïß'_'´ú±í¿Õ¸ñ)
-*/
-STAFF *STAFFReadFile();
+VIP *Find_Vip(VIP *head, int index);  //ÔÚ»áÔ±Á´±íÖĞÑ°ÕÒidÎªindexµÄ»áÔ±½áµã£¬·µ»ØÖ¸Ïò¸Ã½áµãµÄÖ¸Õë
+STAFF *STAFFReadFile();  //´ÓÎÄ¼şÖĞ¶ÁÈ¡Ô±¹¤Êı¾İ
 void STAFF__init__(STAFF *node);  //Ô±¹¤½áµã³õÊ¼»¯£¬·µ»ØÎŞÉÚ±ø½áµã
-/*
-Ô±¹¤ÎÄ¼şµÄĞ´Èë¸ñÊ½£º
-_index,name,tel,money,password,loss(bool),position,(if(position)=1:orderlist....)
-index,name,tel,money,password,loss(bool),position,(if(position)=1:orderlist....)
-(ÏÂ»®Ïß'_'´ú±í¿Õ¸ñ)
-*/
-void STAFFInputFile(STAFF *head);
+void STAFFInputFile(STAFF *head);  //½«Ô±¹¤Êı¾İĞ´ÈëÎÄ¼ş
 int STAFFPosition(STAFF *node);  //Ñ¡ÔñÔ±¹¤µÄÖ°Î»
 int STAFFmoney(VIP *node);  //Ñ¡ÔñÔ±¹¤µÄ¹¤×Ê
 STAFF *STAFFadd(STAFF *head);  //Ìí¼ÓÔ±¹¤
@@ -226,29 +219,46 @@ void ModandShowstaffDetail(STAFF *head,int version); //¶ÔÔ±¹¤µÄ²Ù×÷ºÍĞŞ¸Ä
 void STAFFdetele(STAFF *head);  //Ô±¹¤É¾³ı
 void VIPadminoperation();  //admin¶Ô»áÔ±µÄ²Ù×÷£¨API£©
 void STAFFadminoperation();  //root¶ÔÔ±¹¤µÄ²Ù×÷½çÃæ £¨API£©
-VIP *VIPRegister(VIP *VIPlisthead);
-VIP *VIPlogin(VIP *VIPheadlist);
-void STAFFoperationUSER(STAFF *node);
-void VIPoperationUSER(VIP *node);
-void Default();
-void ROOT();
-int RootLogin();
-//¹«¹²º¯Êı
-void toxy(int x,int y);//½«¹â±êÒÆ¶¯µ½x£¬y×ø±ê´¦
-void HideCursor(int x);//Òş²Ø¹â±ê
-char *HidePassword();//Òş²ØÃÜÂë
-int Check_Number(char ch[],int maxnum,int maxlen);  //¼ì²éÊı×ÖÊÇ·ñºÏ¹æ(ºÏ¹æÇÒ²»³¬¹ımaxnu·µ»Ø¶ÔÓ¦µÄÊı×ÖÖµ£¬ºÏ¹æµ«³¬¹ımax·µ»Ø-1£¬²»ºÏ¹æ·µ»Ø-2)
-void color(int x);  //ÉèÖÃ×ÖÌåÑÕÉ«
+VIP *VIPRegister(VIP *VIPlisthead);  //×¢²á»áÔ±
+VIP *VIPlogin(VIP *VIPheadlist);  //»áÔ±µÇÂ½
+void STAFFoperationUSER(STAFF *node);  //user»áÔ±²Ù×÷
+void VIPoperationUSER(VIP *node);  //user»áÔ±²Ù×÷
+void ShowMonthSales(int a);  //Õ¹Ê¾¸÷ÀàÒûÆ·µÄÔÂÏúÁ¿
+void ShowSeasonSales(int a);  //Õ¹Ê¾¸÷ÀàÒûÆ·µÄ¼¾¶ÈĞ¡ÁÏ
+void ShowYearSales(int a);  //Õ¹Ê¾¸÷ÀàÒûÆ·µÄÄê¶ÈĞ¡ÁÏ
+void Check_Month_Sales();  //¼ì²éÔÂÏúÁ¿
+void Check_Season_Sales();  //¼ì²é¼¾¶ÈÏúÁ¿
+void Check_Year_Sales();  //¼ì²éÄê¶ÈÏúÁ¿
+void ShowSale();  //²é¿´¸÷ÒûÆ·ÏúÁ¿
+void AddGoods();  //Ìí¼ÓÉÌÆ·
+void DeleteGoods();  //É¾³ıÉÌÆ·
+void ManageGoods();  //ÉÌÆ·¹ÜÀí
+void ModifyPrice(); //ĞŞ¸ÄÉÌÆ·¼Û¸ñ
+void ChangeGoods();  //ÔöÉ¾ÉÌÆ·ÖÖÀà
+int Show_Goods(Beverage *h);   //Õ¹Ê¾ÒûÆ·ÀàĞÍ,·µ»Øµ±Ç°ÒûÆ·¸öÊı
+float CheckFloat(char a[],int len);  //¼ì²éÊäÈëÊÇ·ñÎªÕı¸¡µãÊı
+int EnsureDelete(Beverage* p);  //¶ş´ÎÈ·ÈÏÉ¾³ı¸ÃÉÌÆ·,È·ÈÏ·µ»Ø1£¬È¡ÏûÉ¾³ı·µ»Ø-1
+int RootLogin();  //ROOT¹ÜÀíÒ³ÃæµÄµÇÂ½Ò³Ãæ
 
-//º¯ÊıÊµÏÖÇø
-void toxy(int x,int y)//½«¹â±êÒÆ¶¯µ½x£¬y×ø±ê´¦
+
+/* ¹«¹²º¯Êı  */
+void toxy(int x,int y);  //½«¹â±êÒÆ¶¯µ½x£¬y×ø±ê´¦
+void HideCursor(int x);  //Òş²Ø¹â±ê
+char *HidePassword();  //Òş²ØÃÜÂë
+int Check_Number(char ch[],int maxnum,int maxlen);  //¼ì²éÊı×ÖÊÇ·ñºÏ¹æ(ºÏ¹æÇÒ²»³¬¹ımaxnm·µ»Ø¶ÔÓ¦µÄÊı×ÖÖµ£¬ºÏ¹æµ«³¬¹ımax·µ»Ø-1£¬²»ºÏ¹æ·µ»Ø-2)
+void color(int x);  //ÉèÖÃ×ÖÌåÑÕÉ«
+void setColor(unsigned short ForeColor,unsigned short BackGroundColor);  //ÉèÖÃÊä³ö´°¿Ú±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
+
+
+/* º¯ÊıÊµÏÖÇø  */
+void toxy(int x,int y)  //½«¹â±êÒÆ¶¯µ½x£¬y×ø±ê´¦
 {
     COORD pos={x,y};
     HANDLE Out = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleCursorPosition(Out,pos);
 }
 
-void HideCursor(int x)//Òş²Ø¹â±ê ,µ±xÎª0Ê±£¬Òş²Ø£¬Îª1Ê±£¬ÏÔÊ¾
+void HideCursor(int x)  //Òş²Ø¹â±ê ,µ±xÎª0Ê±£¬Òş²Ø£¬Îª1Ê±£¬ÏÔÊ¾
 {
     CONSOLE_CURSOR_INFO cursor_info ={1,x};
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cursor_info);
@@ -413,43 +423,43 @@ Material* Find_Material(int x,Material* h)  //ÕÒµ½hÎªÉÚÎ»½áµãµÄÁ´±íÖĞidÎªxµÄ½áµã
     return p->next;
 }
 
-
 int Show_Beverages(Beverage *h)  //Õ¹Ê¾ÒûÆ·ÀàĞÍ(½«hÖ¸ÏòµÄÁ´±íÖĞ´æ·ÅµÄÒûÆ·ĞÅÏ¢Êä³öµ½ÆÁÄ»),·µ»ØÁ´±íµÄ³¤¶È£¬¼´ÒûÆ·Àà±ğµÄÊıÁ¿
 {
     int num=0;
-    int x1=22,x2=34,x3=Lstrict,y=13;  //¹â±êËùÔÚµÄÎ»ÖÃ×ø±ê
+    int x1=22,x2=34,x3=46,y=13;  //¹â±êËùÔÚµÄÎ»ÖÃ×ø±ê
     if(h->next==NULL)
     {
-        toxy(x1,y);
+        toxy(X_COORD+x1,y);
         printf("ÔİÎŞÒûÆ·...ÇëÁªÏµ¹ÜÀíÔ±½øĞĞÌí¼Ó");
+        return 0;
     }
     else
     {
-        toxy(x1,y);
-        printf("ÒûÆ·id");
-        toxy(x2,y);
+        toxy(X_COORD+x1,y);
+        printf("ÒûÆ·ID");
+        toxy(X_COORD+x2,y);
         printf("ÒûÆ·Ãû³Æ");
-        toxy(x3,y);
+        toxy(X_COORD+x3+1,y);
         printf("ÒûÆ·¼Û¸ñ(?)");
         x1+=2;
         while(h->next!=NULL)
         {
             y+=1;
-            toxy(x1,y);
+            toxy(X_COORD+x1,y);
             printf("%d",h->next->id);
-            toxy(x2,y);
+            toxy(X_COORD+x2,y);
             printf("%s",h->next->name);
-            toxy(x3,y);
+            toxy(X_COORD+x3+3,y);
             printf("%.1f",h->next->price);
             h=h->next;
             num++;
         }
         y+=1;
-        toxy(x1,y);
+        toxy(X_COORD+x1,y);
         printf("ÊäÈë0ÖØĞÂÑ¡Ôñ±­Êı");
         y+=1;
-        toxy(x1,y);
-        printf("ÊäÈëÒûÆ·µÄid½øĞĞÑ¡Ôñ(°´»Ø³µÈ·ÈÏ)£º");
+        toxy(X_COORD+x1,y);
+        printf("ÊäÈëÒûÆ·µÄID½øĞĞÑ¡Ôñ(°´»Ø³µÈ·ÈÏ)£º");
     }
     return num;
 }
@@ -482,13 +492,13 @@ void Choose_FormNum(Complete_Form* cf)  //Ñ¡Ôñcf¶ÔÓ¦¶©µ¥µÄ±­Êı
     system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
     system("cls");  //ÇåÆÁ
     HideCursor(1);  //ÏÔÊ¾¹â±ê
-    toxy(28,8);
+    toxy(X_COORD+28,8);
     printf("     Ê±ÉĞÅİ°Éµãµ¥ÏµÍ³");
-    toxy(22,9);
+    toxy(X_COORD+22,9);
     printf("-------------------------------------");
     if(node_VIP!=NULL)  //Èç¹ûµãµ¥µÄÎª»áÔ±£¬·¢³öÎÊºò
     {
-        toxy(28,10);
+        toxy(X_COORD+28,10);
         if(cf->id.hour<=12)
         {
             printf("ÉÏÎçºÃ,%s",node_VIP->name);
@@ -502,14 +512,14 @@ void Choose_FormNum(Complete_Form* cf)  //Ñ¡Ôñcf¶ÔÓ¦¶©µ¥µÄ±­Êı
             printf("ÍíÉÏºÃ,%s",node_VIP->name);
         }
     }
-    toxy(28,11);
+    toxy(X_COORD+28,11);
     printf("ÇëÊäÈë´Ëµ¥µÄ±­Êı:");
-    toxy(25,13);
+    toxy(X_COORD+25,13);
     printf("ÌáÊ¾£º");
-    toxy(25,14);
+    toxy(X_COORD+25,14);
     printf("Ò»´Î×î¶àµã%d±­(°´»Ø³µÈ·ÈÏ)",Max_Form_Num);
     char ch[Max_User_Enter];
-    toxy(45,11);
+    toxy(X_COORD+45,11);
     fflush(stdin);
     scanf("%s",ch);
     fflush(stdin);
@@ -522,7 +532,7 @@ void Choose_FormNum(Complete_Form* cf)  //Ñ¡Ôñcf¶ÔÓ¦¶©µ¥µÄ±­Êı
     }
     else if(x==-1)
     {
-        toxy(25,15);
+        toxy(X_COORD+25,15);
         HideCursor(0);
         printf("ÊäÈëÊı×Ö³¬¹ı×î´óÁ¿,Çë1sºóÖØĞÂÊäÈë");
         Sleep(1000);
@@ -531,7 +541,7 @@ void Choose_FormNum(Complete_Form* cf)  //Ñ¡Ôñcf¶ÔÓ¦¶©µ¥µÄ±­Êı
     else if(x==-2||x==0)
     {
         HideCursor(0);
-        toxy(25,15);
+        toxy(X_COORD+25,15);
         printf("ÊäÈëÄÚÈİ²»ºÏ¹æ£¬Çë1sºóÖØĞÂÊäÈëÊı×Ö");
         Sleep(1000);
         Choose_FormNum(cf);  //µİ¹éÖ±ÖÁÊäÈëºÏ¹æ
@@ -539,7 +549,7 @@ void Choose_FormNum(Complete_Form* cf)  //Ñ¡Ôñcf¶ÔÓ¦¶©µ¥µÄ±­Êı
     return;
 }
 
-void Choose_Beverage(Complete_Form* cf,int i)
+void Choose_Beverage(Complete_Form* cf,int i)  //¶ÔcfÖ¸Ïò¶©µ¥µÄµÚi·Ö½øĞĞÑ¡ÔñÒûÆ·ÀàĞÍ
 {
     system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
     system("cls");  //ÇåÆÁ
@@ -547,11 +557,11 @@ void Choose_Beverage(Complete_Form* cf,int i)
     int c;  //´æ´¢Êı×ÖºÏ¹æ¼ì²éµÄ·µ»ØÖµ
     int Beverage_Num;  //±£´æÄ¿Ç°ÒûÆ·ÖÖÀàÊı
     char ch[Max_User_Enter];  //±£´æÓÃ»§ÊäÈë
-    toxy(28,8);
+    toxy(X_COORD+28,8);
     printf("     Ê±ÉĞÅİ°Éµãµ¥ÏµÍ³");
-    toxy(22,9);
+    toxy(X_COORD+22,9);
     printf("-------------------------------------");
-    toxy(27,11);
+    toxy(X_COORD+27,11);
     printf("ÇëÑ¡ÔñµÚ%d±­ÒûÆ·:\n",i);
     Beverage_Num = Show_Beverages(head_beverage);
     fflush(stdin);
@@ -574,13 +584,17 @@ void Choose_Beverage(Complete_Form* cf,int i)
     }
     else if(c==-1)
     {
-        printf("\t\tÊäÈëÊı×Ö³¬¹ıÒûÆ·µÄÊıÁ¿,Çë1sºóÖØĞÂÑ¡Ôñ");
+        toxy(X_COORD+21,33);
+        HideCursor(0);
+        printf("ÊäÈëÊı×Ö³¬¹ıÒûÆ·µÄÊıÁ¿,Çë1sºóÖØĞÂÑ¡Ôñ");
         Sleep(1000);  //ÔİÍ£1ÃëÏÔÊ¾ÌáÊ¾ĞÅÏ¢
         Choose_Beverage(cf,i);  //ÖØĞÂÊäÈë
     }
     else
     {
-        printf("\t\tÊäÈëÄÚÈİ²»ºÏ¹æ£¬Çë1sºóÖØĞÂÊäÈëÒûÆ·¶ÔÓ¦µÄid");
+        toxy(X_COORD+21,33);
+        HideCursor(0);
+        printf("ÊäÈëÄÚÈİ²»ºÏ¹æ£¬Çë1sºóÖØĞÂÊäÈëÒûÆ·¶ÔÓ¦µÄid");
         Sleep(1000);  //ÔİÍ£1ÃëÏÔÊ¾ÌáÊ¾ĞÅÏ¢
         Choose_Beverage(cf,i);  //ÖØĞÂÊäÈë
     }
@@ -607,42 +621,52 @@ void Choose_Beverage(Complete_Form* cf,int i)
 7 = °×É«       15 = ÁÁ°×É«
 
 */
-void setColor(unsigned short ForeColor,unsigned short BackGroundColor)
-
+void setColor(unsigned short ForeColor,unsigned short BackGroundColor)  //ÉèÖÃÊä³ö´°¿Ú±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
 {
-
-    HANDLE handle=GetStdHandle(STD_OUTPUT_HANDLE);//»ñÈ¡µ±Ç°´°¿Ú¾ä±ú
-
-    SetConsoleTextAttribute(handle,ForeColor+BackGroundColor*0x10);//ÉèÖÃÑÕÉ«
-
+    HANDLE handle=GetStdHandle(STD_OUTPUT_HANDLE);  //»ñÈ¡µ±Ç°´°¿Ú¾ä±ú
+    SetConsoleTextAttribute(handle,ForeColor+BackGroundColor*0x10);  //ÉèÖÃÑÕÉ«
 }
 
-void Choose_Ingredients(Complete_Form* cf,int i)
+void Choose_Ingredients(Complete_Form* cf,int i)  //¶ÔcfÖ¸ÏòµÄ¶©µ¥µÄµÚi·İ½øĞĞÑ¡Ôñ¸¨ÁÏ
 {
     system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
     system("cls");  //ÇåÆÁ
     HideCursor(0);  //Òş²Ø¹â±ê
     char t;  //¶ÁÈëÑ¡Ôñ¶ÔÓ¦µÄ×Ö·û
-    toxy(28,8);
-    printf("     Ê±ÉĞÅİ°Éµãµ¥ÏµÍ³");
-    toxy(22,9);
+    toxy(X_COORD+28,8);
+    printf("    Ê±ÉĞÅİ°Éµãµ¥ÏµÍ³");
+    toxy(X_COORD+22,9);
     printf("-------------------------------------");
-    toxy(26,11);
-    printf("ÇëÑ¡ÔñµÚ%d±­ĞèÒªÌí¼ÓµÄĞ¡ÁÏ",i);
-    toxy(27,13);
-    printf("1.²¼¶¡--1Ôª");
-    toxy(27,14);
-    printf("2.Ò¬¹û--1Ôª");
-    toxy(27,15);
-    printf("3.ºì¶¹--2Ôª");
-    toxy(27,16);
-    printf("4.ÕäÖé--2Ôª");
-    toxy(27,17);
-    printf("5.²»Ìí¼ÓĞ¡ÁÏ");
-    toxy(27,18);
-    printf("0.ÖØĞÂÑ¡Ôñ±­Êı");
-    toxy(27,19);
-    printf("Esc.·µ»ØÖ÷½çÃæ");
+    toxy(X_COORD+28,11);
+    printf("ÇëÑ¡ÔñµÚ%d±­ĞèÒªÌí¼ÓµÄĞ¡ÁÏ£º",i);
+    toxy(X_COORD+31,13);
+    printf("| 1.²¼¶¡---1Ôª");
+    toxy(X_COORD+48,13);
+    printf("|");
+    toxy(X_COORD+31,15);
+    printf("| 2.Ò¬¹û---1Ôª");
+    toxy(X_COORD+48,15);
+    printf("|");
+    toxy(X_COORD+31,17);
+    printf("| 3.ºì¶¹---2Ôª");
+    toxy(X_COORD+48,17);
+    printf("|");
+    toxy(X_COORD+31,19);
+    printf("| 4.ÕäÖé---2Ôª");
+    toxy(X_COORD+48,19);
+    printf("|");
+    toxy(X_COORD+31,21);
+    printf("| 5.²»Ìí¼ÓĞ¡ÁÏ");
+    toxy(X_COORD+48,21);
+    printf("|");
+    toxy(X_COORD+31,23);
+    printf("| 0.ÖØĞÂÑ¡Ôñ±­Êı");
+    toxy(X_COORD+48,23);
+    printf("|");
+    toxy(X_COORD+31,25);
+    printf("| Esc.·µ»ØÖ÷½çÃæ");
+    toxy(X_COORD+48,25);
+    printf("|");
     fflush(stdin);
     t = getch();
     fflush(stdin);
@@ -674,7 +698,7 @@ void Choose_Ingredients(Complete_Form* cf,int i)
             Default();
             return;
         default:
-            toxy(25,21);
+            toxy(X_COORD+25,21);
             printf("Çë¸ù¾İ¶ÔÓ¦±êºÅ½øĞĞÑ¡Ôñ");
             Choose_Ingredients(cf,i);  //µİ¹éÖ±ÖÁÊäÈëºÏ¹æ
             return;
@@ -687,9 +711,9 @@ void Choose_Ingredients(Complete_Form* cf,int i)
     }
     else  //Ô­²ÄÁÏ¿â´æ²»×ã£¬¸ø³öÌáÊ¾£¬ÖØĞÂµãµ¥
     {
-        toxy(23,21);
+        toxy(X_COORD+23,21);
         printf("%s¿â´æ²»×ã£¬ÇëÁªÏµ¹ÜÀíÔ±½øĞĞÌí¼Ó",ci_return->name);
-        toxy(23,22);
+        toxy(X_COORD+23,22);
         printf("Á½Ãëºó×Ô¶¯·µ»Øµãµ¥Ò³Ãæ");
         Sleep(2000);
         Order(); //·µ»Øµãµ¥Ò³Ãæ
@@ -697,30 +721,42 @@ void Choose_Ingredients(Complete_Form* cf,int i)
     }
 }
 
-void Choose_Temperature(Complete_Form* cf,int i)
+void Choose_Temperature(Complete_Form* cf,int i)  //¶ÔcfÖ¸ÏòµÄ¶©µ¥µÄµÚi·İ½øĞĞÑ¡ÔñÎÂ¶È
 {
     system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
     system("cls");  //ÇåÆÁ
     HideCursor(0);  //Òş²Ø¹â±ê
     char t;
-    toxy(28,8);
-    printf("     Ê±ÉĞÅİ°Éµãµ¥ÏµÍ³");
-    toxy(22,9);
+    toxy(X_COORD+28,8);
+    printf("    Ê±ÉĞÅİ°Éµãµ¥ÏµÍ³");
+    toxy(X_COORD+22,9);
     printf("-------------------------------------");
-    toxy(26,11);
-    printf("ÇëÑ¡ÔñµÚ%d±­µÄÒûÓÃÎÂ¶È",i);
-    toxy(27,13);
-    printf("1.¼Ó±ù");
-    toxy(27,14);
-    printf("2.³£ÎÂ");
-    toxy(27,15);
-    printf("3.Î¢ÈÈ");
-    toxy(27,16);
-    printf("4.ÈÈ");
-    toxy(27,17);
-    printf("0.ÖØĞÂÑ¡Ôñ±­Êı");
-    toxy(27,18);
-    printf("Esc.·µ»ØÖ÷½çÃæ");
+    toxy(X_COORD+30,11);
+    printf("ÇëÑ¡ÔñµÚ%d±­µÄÒûÓÃÎÂ¶È:",i);
+    toxy(X_COORD+31,13);
+    printf("| 1.¼Ó±ù");
+    toxy(X_COORD+48,13);
+    printf("|");
+    toxy(X_COORD+31,15);
+    printf("| 2.³£ÎÂ");
+    toxy(X_COORD+48,15);
+    printf("|");
+    toxy(X_COORD+31,17);
+    printf("| 3.Î¢ÈÈ");
+    toxy(X_COORD+48,17);
+    printf("|");
+    toxy(X_COORD+31,19);
+    printf("| 4.ÈÈ");
+    toxy(X_COORD+48,19);
+    printf("|");
+    toxy(X_COORD+31,21);
+    printf("| 0.ÖØĞÂÑ¡Ôñ±­Êı");
+    toxy(X_COORD+48,21);
+    printf("|");
+    toxy(X_COORD+31,23);
+    printf("| Esc.·µ»ØÖ÷½çÃæ");
+    toxy(X_COORD+48,23);
+    printf("|");
     fflush(stdin);
     t = getch();
     fflush(stdin);
@@ -745,8 +781,8 @@ void Choose_Temperature(Complete_Form* cf,int i)
             Default();
             return;
         default:
-            toxy(25,20);
-            printf("ÊäÈë²»ºÏ¹æ,ÇëÖØĞÂÊäÈë");
+            toxy(X_COORD+25,25);
+            printf("Çë¸ù¾İ±êºÅ½øĞĞÑ¡Ôñ");
             Choose_Temperature(cf,i);  //µİ¹éÖ±ÖÁÊäÈëºÏ¹æ
             return;
     }
@@ -754,31 +790,34 @@ void Choose_Temperature(Complete_Form* cf,int i)
     return;
 }
 
-void Choose_Drinkplace(Complete_Form* cf,int i)
+void Choose_Drinkplace(Complete_Form* cf,int i)  //¶ÔcfÖ¸ÏòµÄ¶©µ¥µÄµÚi·İ½øĞĞÑ¡ÔñÒûÆ·µØµã
 {
     system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
     system("cls");  //ÇåÆÁ
     HideCursor(0);  //Òş²Ø¹â±ê
     char t;
-    toxy(28,8);
-    printf("     Ê±ÉĞÅİ°Éµãµ¥ÏµÍ³");
-    toxy(22,9);
+    toxy(X_COORD+28,8);
+    printf("    Ê±ÉĞÅİ°Éµãµ¥ÏµÍ³");
+    toxy(X_COORD+22,9);
     printf("-------------------------------------");
-    toxy(26,11);
+    toxy(X_COORD+30,11);
     printf("ÇëÑ¡ÔñµÚ%d±­µÄÒûÓÃµØµã",i);
-    toxy(27,13);
-    printf("1.ÌÃÊ³");
-    toxy(27,14);
-    printf("2.Íâ´ø(´ò°ü)");
-    toxy(27,15);
-    printf("0.ÖØĞÂÑ¡Ôñ±­Êı");
-    toxy(27,16);
-    printf("Esc.·µ»ØÖ÷½çÃæ");
-//    printf("ÇëÑ¡ÔñµÚ%d±­µÄÒûÓÃµØµã\n",i);
-//    printf("\t\t°´ÏÂesc¼ü·µ»ØÖ÷Ò³Ãæ\n");
-//    printf("\t\t1.ÌÃÊ³\n");
-//    printf("\t\t2.Íâ´ø(´ò°ü)\n");
-//    printf("\t\t0.ÖØĞÂÑ¡Ôñ±­Êı\n");
+    toxy(X_COORD+31,13);
+    printf("| 1.ÌÃÊ³");
+    toxy(X_COORD+48,13);
+    printf("|");
+    toxy(X_COORD+31,15);
+    printf("| 2.Íâ´ø(´ò°ü)");
+    toxy(X_COORD+48,15);
+    printf("|");
+    toxy(X_COORD+31,17);
+    printf("| 0.ÖØĞÂÑ¡Ôñ±­Êı");
+    toxy(X_COORD+48,17);
+    printf("|");
+    toxy(X_COORD+31,19);
+    printf("| Esc.·µ»ØÖ÷½çÃæ");
+    toxy(X_COORD+48,19);
+    printf("|");
     fflush(stdin);
     t = getch();
     fflush(stdin);
@@ -797,8 +836,8 @@ void Choose_Drinkplace(Complete_Form* cf,int i)
             Default();
             return;
         default:
-            toxy(25,18);
-            printf("ÊäÈë²»ºÏ¹æ,ÇëÖØĞÂÊäÈë");
+            toxy(X_COORD+25,21);
+            printf("Çë¸ù¾İ±êºÅ½øĞĞÑ¡Ôñ");
             Choose_Drinkplace(cf,i);  //µİ¹éÖ±ÖÁÊäÈëºÏ¹æ
             return;
     }
@@ -826,38 +865,44 @@ void Get_CpTotalprice(Complete_Form* cf)  //¼ÆËãÕû¸ö¶©µ¥µÄ¼Û¸ñ²¢ÎªÆätotal_priceÊ
     return;
 }
 
-void Choose_Payway(Complete_Form* cf)
+void Choose_Payway(Complete_Form* cf)  //Ñ¡ÔñÖ§¸¶·½Ê½
 {
     system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
     system("cls");  //ÇåÆÁ
     HideCursor(0);  //Òş²Ø¹â±ê
     char t;
     Get_CpTotalprice(cf);  //¼ÆËãµ±Ç°¶©µ¥¼Û¸ñ
-    toxy(28,8);
-    printf("     Ê±ÉĞÅİ°Éµãµ¥ÏµÍ³");
-    toxy(22,9);
+    toxy(X_COORD+28,8);
+    printf("    Ê±ÉĞÅİ°Éµãµ¥ÏµÍ³");
+    toxy(X_COORD+22,9);
     printf("-------------------------------------");
-    toxy(26,11);
-    printf("¶©µ¥×Ü¼ÛÎª:%.1fÔª,ÇëÑ¡ÔñÖ§¸¶·½Ê½",cf->total_price);
-    toxy(27,13);
-    printf("1.ÏÖ½ğÖ§¸¶");
-    toxy(27,14);
-    printf("2.ÔÚÏßÖ§¸¶");
-//    printf("¶©µ¥×Ü¼ÛÎª:%.1fÔª,ÇëÑ¡ÔñÖ§¸¶·½Ê½\n",cf->total_price);
-//    printf("\t\t°´ÏÂesc¼ü·µ»ØÖ÷Ò³Ãæ\n");
-//    printf("\t\t1.ÏÖ½ğÖ§¸¶\n");
-//    printf("\t\t2.ÔÚÏßÖ§¸¶\n");
+    toxy(X_COORD+24,11);
+    printf("¶©µ¥×Ü¼ÛÎª:%.1fÔª,ÇëÑ¡ÔñÖ§¸¶·½Ê½£º",cf->total_price);
+    toxy(X_COORD+31,13);
+    printf("| 1.ÏÖ½ğÖ§¸¶");
+    toxy(X_COORD+48,13);
+    printf("|");
+    toxy(X_COORD+31,15);
+    printf("| 2.ÔÚÏßÖ§¸¶");
+    toxy(X_COORD+48,15);
+    printf("|");
     if(cf->is_member>0)
     {
-        toxy(27,15);
-        printf("3.»áÔ±¿¨Ö§¸¶(85ÕÛ)");
-        toxy(27,16);
-        printf("Esc.·µ»ØÖ÷½çÃæ");
+        toxy(X_COORD+31,17);
+        printf("| 3.»áÔ±¿¨Ö§¸¶(85ÕÛ)");
+        toxy(X_COORD+48,17);
+        printf("|");
+        toxy(X_COORD+31,19);
+        printf("| Esc.·µ»ØÖ÷½çÃæ");
+        toxy(X_COORD+48,19);
+        printf("|");
     }
     else
     {
-        toxy(27,15);
+        toxy(X_COORD+31,17);
         printf("Esc.·µ»ØÖ÷½çÃæ");
+        toxy(X_COORD+48,17);
+        printf("|");
     }
     fflush(stdin);
     t = getch();
@@ -868,14 +913,14 @@ void Choose_Payway(Complete_Form* cf)
         {
             case '1':
                 cf->pay_way = 1;
-                toxy(25,18);
+                toxy(X_COORD+32,18);
                 printf("Ğ»Ğ»»İ¹Ë£¡£¡£¡");
                 judgeFormOk = 1;
                 Sleep(1000);  //ÔİÍ£1ÃëÏÔÊ¾ÌáÊ¾ĞÅÏ¢
                 break;
             case '2':
                 cf->pay_way = 2;
-                toxy(25,18);
+                toxy(X_COORD+32,18);
                 printf("Ğ»Ğ»»İ¹Ë£¡£¡£¡");
                 judgeFormOk = 1;
                 Sleep(1000);  //ÔİÍ£1ÃëÏÔÊ¾ÌáÊ¾ĞÅÏ¢
@@ -884,7 +929,7 @@ void Choose_Payway(Complete_Form* cf)
                 Default();
                 return;
             default:
-                toxy(25,18);
+                toxy(X_COORD+25,18);
                 printf("ÊäÈë²»ºÏ¹æ,ÇëÖØĞÂÊäÈë");
                 Choose_Payway(cf);
                 return;
@@ -896,14 +941,14 @@ void Choose_Payway(Complete_Form* cf)
         {
             case '1':
                 cf->pay_way = 1;
-                toxy(25,18);
+                toxy(X_COORD+32,18);
                 printf("Ğ»Ğ»»İ¹Ë£¡£¡£¡");
                 judgeFormOk = 1;
                 Sleep(1000);  //ÔİÍ£1ÃëÏÔÊ¾ÌáÊ¾ĞÅÏ¢
                 break;
             case '2':
                 cf->pay_way = 2;
-                toxy(25,18);
+                toxy(X_COORD+32,18);
                 printf("Ğ»Ğ»»İ¹Ë£¡£¡£¡");
                 judgeFormOk = 1;
                 Sleep(1000);  //ÔİÍ£1ÃëÏÔÊ¾ÌáÊ¾ĞÅÏ¢
@@ -913,16 +958,16 @@ void Choose_Payway(Complete_Form* cf)
                 if(node_VIP->restmoney>cf->total_price)
                 {
                     node_VIP->restmoney -= cf->total_price*0.85;
-                    toxy(24,18);
+                    toxy(X_COORD+24,18);
                     printf("»áÔ±¿¨Ö§¸¶Íê±Ï,Äú»¹Ê£Óà%.2fÔª",node_VIP->restmoney);
-                    toxy(25,18);
+                    toxy(X_COORD+32,19);
                     printf("Ğ»Ğ»»İ¹Ë!!!");
                     judgeFormOk = 1;
                     Sleep(1000);
                 }
                 else
                 {
-                    toxy(24,18);
+                    toxy(X_COORD+24,18);
                     printf("»áÔ±¿¨Óà¶î²»×ã,Ö§¸¶Ê§°Ü");
                     Sleep(1000);
                     return;  //Ö§¸¶Ê§°Ü²»»áÌí¼Óµ½¶©µ¥ÁĞ±í
@@ -932,7 +977,7 @@ void Choose_Payway(Complete_Form* cf)
                 Default();
                 return;
             default:
-                toxy(25,18);
+                toxy(X_COORD+25,18);
                 printf("ÊäÈë²»ºÏ¹æ,ÇëÖØĞÂÊäÈë");
                 Choose_Payway(cf);
                 return;
@@ -1076,7 +1121,6 @@ void Rewrite_MaterialData()  //½«¸üĞÂºóµÄÔ­²ÄÁÏÁ´±íÊı¾İÖØĞÂĞ´»ØÎÄ¼şÖĞ
     return;
 }
 
-
 void VIPFunction()
 {
     VIP *head = VIPReadFile();
@@ -1100,8 +1144,6 @@ int VIPCheck_Name(char *a){
     return 1;
 }
 
-
-
 // return 0´ú±í·µ»Ø£¬1´ú±íÃ»¹ØÏµ*·µ»Ø/Ö÷½çÃæ
 int Register_Name(VIP *node){
     int attation = 0;
@@ -1110,28 +1152,28 @@ int Register_Name(VIP *node){
         char temp[100] = {0};
         char name[100] = {0};
         printf("ESC Ê×Ò³\n *  ·µ»ØÉÏÒ»¼¶");
-        toxy(28, 8);
-        printf("     Ê±ÉĞÅİ°ÉĞÅÏ¢¹ÜÀíÏµÍ³");
-        toxy(22,9);
+        toxy(X_COORD+28, 8);
+        printf("  Ê±ÉĞÅİ°ÉĞÅÏ¢¹ÜÀíÏµÍ³");
+        toxy(X_COORD+22,9);
         printf("-------------------------------------");
-        toxy(Lstrict, Upstrict+1);
+        toxy(X_COORD+Lstrict, Upstrict+1);
         strcpy(temp, "ÇëÊäÈëÄãµÄĞÕÃû£º");
         printf("%s", temp);
         int lenname = strlen(temp);
         if(attation)
             Warning_Type;
-        toxy(Lstrict, Upstrict+2);
+        toxy(X_COORD+Lstrict, Upstrict+2);
         printf("×¢Òâ£¡");
-        toxy(Lstrict, Upstrict+3);
+        toxy(X_COORD+Lstrict, Upstrict+3);
         printf("²»Ó¦³¬³ö20¸ö×Ö·ûÇÒ²»ÄÜÎª¿Õ!");
-        toxy(Lstrict, Upstrict+4);
+        toxy(X_COORD+Lstrict, Upstrict+4);
         printf("²»Ó¦°üÀ¨¿Õ¸ñ!");
         if(attation){
-            toxy(Lstrict, Upstrict+5);
+            toxy(X_COORD+Lstrict, Upstrict+5);
             Normal_Type;
             printf("ÇëÖØÊÔ£¡");
         }
-        toxy(Lstrict + lenname + 1, Upstrict+1);
+        toxy(X_COORD+Lstrict + lenname + 1, Upstrict+1);
         int i = 0;
         char c = 1;
         int flag = 0;
@@ -1224,41 +1266,41 @@ int Register_tel(VIP *node,VIP *head){
         char temp[100] = {0};
         char tel[100] = {0};
         printf("ESC Ê×Ò³\n *  ·µ»ØÉÏÒ»¼¶");
-        toxy(28, 8);
-        printf("     Ê±ÉĞÅİ°ÉĞÅÏ¢¹ÜÀíÏµÍ³");
-        toxy(22,9);
+        toxy(X_COORD+28, 8);
+        printf("  Ê±ÉĞÅİ°ÉĞÅÏ¢¹ÜÀíÏµÍ³");
+        toxy(X_COORD+22,9);
         printf("-------------------------------------");
-        toxy(Lstrict, Upstrict+1);
+        toxy(X_COORD+Lstrict, Upstrict+1);
         strcpy(temp, "ÇëÊäÈëÄãµÄµç»°:");
         printf("%s", temp);
         int lentel = strlen(temp);
         if(attation)
             Warning_Type;
-        toxy(Lstrict, Upstrict+2);
+        toxy(X_COORD+Lstrict, Upstrict+2);
         printf("×¢Òâ£¡");
-        toxy(Lstrict, Upstrict+3);
+        toxy(X_COORD+Lstrict, Upstrict+3);
         printf("²»Ó¦³¬³ö20Î»Êı×ÖÇÒ²»ÄÜÎª¿Õ");
-        toxy(Lstrict, Upstrict+4);
+        toxy(X_COORD+Lstrict, Upstrict+4);
         printf("Ö»ÄÜÊäÈëÊı×Ö");
-        toxy(Lstrict, Upstrict+5);
+        toxy(X_COORD+Lstrict, Upstrict+5);
         printf("½öÖ§³ÖÒÆ¶¯ÊÖ»úºÅÂë");
-        toxy(Lstrict, Upstrict+7);
+        toxy(X_COORD+Lstrict, Upstrict+7);
         Normal_Type;
         if(flag_tel_repeat){
             flag_tel_repeat = 0;
             Warning_Type;
             printf("´ËºÅÂëÒÑ´æÔÚ£¬ÇëÖØĞÂÊäÈë£¡");
             Normal_Type;
-            toxy(Lstrict, Upstrict+6);
+            toxy(X_COORD+Lstrict, Upstrict+6);
             printf("ÇëÖØÊÔ£¡");
         }
-        toxy(Lstrict, Upstrict+6);
+        toxy(X_COORD+Lstrict, Upstrict+6);
         if(attation){
             Normal_Type;
             printf("ÇëÖØÊÔ£¡");
             attation = 0;
         }
-        toxy(Lstrict + lentel + 1, Upstrict+1);
+        toxy(X_COORD+Lstrict + lentel + 1, Upstrict+1);
         char c=1;
         int i = 0;
         while(c){
@@ -1373,27 +1415,27 @@ int Register_password(VIP *node){
         char temp[100] = {0};
         if(norepeat){
             printf("ESC Ê×Ò³\n *  ·µ»ØÉÏÒ»¼¶");
-            toxy(28, 8);
-            printf("     Ê±ÉĞÅİ°ÉĞÅÏ¢¹ÜÀíÏµÍ³");
-            toxy(22,9);
+            toxy(X_COORD+28, 8);
+            printf("  Ê±ÉĞÅİ°ÉĞÅÏ¢¹ÜÀíÏµÍ³");
+            toxy(X_COORD+22,9);
             printf("-------------------------------------");
-            toxy(Lstrict, Upstrict+1);
+            toxy(X_COORD+Lstrict, Upstrict+1);
             strcpy(temp, "ÇëÊäÈëÄãµÄÃÜÂë:");
             printf("%s", temp);// ÖØ¸´Ê±passwordÒÑ¾­ÌîºÃÁË
             for (int i = 0; i < strlen(password);i++)
                 printf("*");
             printf("\n");
             lenpassword = strlen(temp);
-            toxy(Lstrict, Upstrict+2);
+            toxy(X_COORD+Lstrict, Upstrict+2);
             strcpy(temp, "ÇëÖØĞÂÊäÈëÃÜÂë:");
             printf("%s", temp);
-            toxy(Lstrict, Upstrict+4);
+            toxy(X_COORD+Lstrict, Upstrict+4);
             if(norepeat>=2){
                 Warning_Type;
                 printf("ÃÜÂë²»Æ¥Åä!");
                 Normal_Type;
             }
-            toxy(Lstrict, Upstrict+3);
+            toxy(X_COORD+Lstrict, Upstrict+3);
             if (norepeat>=2)
             {
                 Normal_Type;
@@ -1401,21 +1443,21 @@ int Register_password(VIP *node){
                 attation = 0;
             }
             if(norepeat){
-                toxy(Lstrict + lenpassword + 1, Upstrict+2);
+                toxy(X_COORD+Lstrict + lenpassword + 1, Upstrict+2);
             }
             else{
-                toxy(Lstrict + lenpassword + 1, Upstrict+1);
+                toxy(X_COORD+Lstrict + lenpassword + 1, Upstrict+1);
             }
             Normal_Type;
         }
         else
         {
             printf("ESC Ê×Ò³\n *  ·µ»ØÉÏÒ»¼¶");
-            toxy(28, 8);
-            printf("     Ê±ÉĞÅİ°ÉĞÅÏ¢¹ÜÀíÏµÍ³");
-            toxy(22,9);
+            toxy(X_COORD+28, 8);
+            printf("  Ê±ÉĞÅİ°ÉĞÅÏ¢¹ÜÀíÏµÍ³");
+            toxy(X_COORD+22,9);
             printf("-------------------------------------");
-            toxy(Lstrict, Upstrict+1);
+            toxy(X_COORD+Lstrict, Upstrict+1);
             strcpy(temp, "ÇëÊäÈëÄãµÄÃÜÂë:");
             printf("%s", temp);
             if(norepeat!=0){// ÖØ¸´Ê±passwordÒÑ¾­ÌîºÃÁË
@@ -1425,26 +1467,26 @@ int Register_password(VIP *node){
             int lenpassword = strlen(temp);
             if (attation)
                 Warning_Type;
-            toxy(Lstrict, Upstrict+2);
+            toxy(X_COORD+Lstrict, Upstrict+2);
             printf("×¢Òâ!");
-            toxy(Lstrict, Upstrict+3);
+            toxy(X_COORD+Lstrict, Upstrict+3);
             printf("²»ÄÜ°üÀ¨¿Õ¸ñÓë*ºÅ");
-            toxy(Lstrict, Upstrict+4);
+            toxy(X_COORD+Lstrict, Upstrict+4);
             printf("³¤¶È±ØĞëÎª8-16¸ö×Ö·û");
-            toxy(Lstrict, Upstrict+5);
+            toxy(X_COORD+Lstrict, Upstrict+5);
             printf("±ØĞë°üº¬Êı×Ö¡¢×ÖÄ¸¡¢·ûºÅÖĞÖÁÉÙ2ÖÖ");
             Normal_Type;
-            toxy(Lstrict, Upstrict+6);
+            toxy(X_COORD+Lstrict, Upstrict+6);
             if (attation)
             {
                 Normal_Type;
                 printf("ÇëÖØÊÔ£¡");
             }
             if(norepeat){
-                toxy(Lstrict + lenpassword + 1, Upstrict+2);
+                toxy(X_COORD+Lstrict + lenpassword + 1, Upstrict+2);
             }
             else{
-                toxy(Lstrict + lenpassword + 1, Upstrict+1);
+                toxy(X_COORD+Lstrict + lenpassword + 1, Upstrict+1);
             }
         }
 
@@ -1770,28 +1812,28 @@ int Register_recharge(VIP *node){
         char temp[100] = {0};
         char money[100] = {0};
         printf("ESC Ê×Ò³\n *  ·µ»ØÉÏÒ»¼¶");
-        toxy(28, 8);
-        printf("     Ê±ÉĞÅİ°ÉĞÅÏ¢¹ÜÀíÏµÍ³");
-        toxy(22,9);
+        toxy(X_COORD+28, 8);
+        printf("  Ê±ÉĞÅİ°ÉĞÅÏ¢¹ÜÀíÏµÍ³");
+        toxy(X_COORD+22,9);
         printf("-------------------------------------");
-        toxy(Lstrict, Upstrict+1);
+        toxy(X_COORD+Lstrict, Upstrict+1);
         strcpy(temp, "ÇëÊäÈëÄúÒª³äÖµµÄ½ğ¶î£¨Èç²»Ïë³äÖµÔò³äÖµ0Ôª£©");
         printf("%s", temp);
         int lentel = strlen(temp);
         if(attation)
             Warning_Type;
-        toxy(Lstrict, Upstrict+2);
+        toxy(X_COORD+Lstrict, Upstrict+2);
         printf("×¢Òâ£¡");
-        toxy(Lstrict, Upstrict+3);
+        toxy(X_COORD+Lstrict, Upstrict+3);
         printf("³äÖµÇ®Êı²»µÃ¶àÓÚ20¸ö×Ö·û");
-        toxy(Lstrict, Upstrict+4);
+        toxy(X_COORD+Lstrict, Upstrict+4);
         printf("½ö¿ÉÊäÈë½ğ¶î");
-        toxy(Lstrict, Upstrict+5);
+        toxy(X_COORD+Lstrict, Upstrict+5);
         if(attation){
             Normal_Type;
             printf("ÇëÖØÊÔ£¡");
         }
-        toxy(Lstrict + lentel + 1, Upstrict+1);
+        toxy(X_COORD+Lstrict + lentel + 1, Upstrict+1);
         char c=1;
         int i = 0;
         while (c)
@@ -1887,23 +1929,23 @@ VIP *VIPlogin(VIP *VIPheadlist){
     // }
     while(1){
         printf("ESC Ê×Ò³\n *  ·µ»ØÉÏÒ»¼¶");
-        toxy(28, 8);
+        toxy(X_COORD+28, 8);
         printf("     Ê±ÉĞÅİ°ÉµÇÂ½ÏµÍ³");
-        toxy(22,9);
+        toxy(X_COORD+22,9);
         printf("-------------------------------------");
         strcpy(temp, "ÇëÊäÈëÊÖ»úºÅ£º");
-        toxy(Lstrict, Upstrict+1);
+        toxy(X_COORD+Lstrict, Upstrict+1);
         printf("ÇëÊäÈëÊÖ»úºÅ£º");
         if(flag_errorcode&&flag_come_back==0)
             printf("%s", node->tel);
         if(flag_notele){
-            toxy(Lstrict, Upstrict+2);
+            toxy(X_COORD+Lstrict, Upstrict+2);
             Warning_Type;
             printf("²éÎŞÊÖ»úºÅ");
             Normal_Type;
             flag_notele = 0;
         }
-        toxy(Lstrict + strlen(temp) + 1, Upstrict+1);
+        toxy(X_COORD+Lstrict + strlen(temp) + 1, Upstrict+1);
         ClearArr_char(temp, 100, 0);
         ClearArr_char(telnum, 20, 0);
         i = 0;// ÖØĞÂ¶ÔtelÊı×é¸³Öµ
@@ -1954,16 +1996,16 @@ VIP *VIPlogin(VIP *VIPheadlist){
             continue;//²éÎŞÊÖ»úºÅ ÖØĞÂ¿ªÊ¼ĞÂµÄ²éÑ¯ÊÖ»úºÅ²Ù×÷
         }
         strcpy(temp, "ÇëÊäÈëÃÜÂë£º");
-        toxy(Lstrict, Upstrict+2);
+        toxy(X_COORD+Lstrict, Upstrict+2);
         printf("%s", temp);
         if(flag_errorcode){
-            toxy(Lstrict, Upstrict+3);
+            toxy(X_COORD+Lstrict, Upstrict+3);
             Warning_Type;
             printf("ÃÜÂë²»ÕıÈ·»òÇëÖØĞÂÈ·ÈÏÃÜÂë¸ñÊ½");
             Normal_Type
             flag_errorcode = 0;
         }
-        toxy(Lstrict + strlen(temp) + 1, Upstrict+2);
+        toxy(X_COORD+Lstrict + strlen(temp) + 1, Upstrict+2);
         ClearArr_char(temp, 100, 0);
         c = 1;
         i = 0;
@@ -2035,20 +2077,20 @@ void VIPUSERshow(VIP *node){
         return;
     system("cls");
     printf("ESC Ê×Ò³\n *  ·µ»ØÉÏÒ»¼¶");
-    toxy(28, 8);
+    toxy(X_COORD+28, 8);
     printf("     Ê±ÉĞÅİ°É»áÔ±ÏµÍ³");
-    toxy(22,9);
+    toxy(X_COORD+22,9);
     printf("-------------------------------------");
-    toxy(Lstrict, Upstrict+1);
+    toxy(X_COORD+Lstrict, Upstrict+1);
     printf("×¢²áÈÕÆÚ£º%04d-%02d-%02d %02d:%02d",
            node->id.year,node->id.month,node->id.day,node->id.hour,node->id.min);
-    toxy(Lstrict, Upstrict+2);
+    toxy(X_COORD+Lstrict, Upstrict+2);
     printf("ĞÕÃû£º%s",node->name);
-    toxy(Lstrict, Upstrict+3);
+    toxy(X_COORD+Lstrict, Upstrict+3);
     printf("µç»°£º%s",node->tel);
-    toxy(Lstrict, Upstrict+4);
+    toxy(X_COORD+Lstrict, Upstrict+4);
     printf("¿¨ÉÏÓà¶î£º%.2f",node->restmoney);
-    toxy(Lstrict, Upstrict+5);
+    toxy(X_COORD+Lstrict, Upstrict+5);
     printf("¿¨×´Ì¬£º");
     if (node->loss)
     {
@@ -2060,36 +2102,36 @@ void VIPUSERshow(VIP *node){
         printf("Õı³£\n");
     }
     if(node->loss){
-        toxy(22,Upstrict+6);
+        toxy(X_COORD+22,Upstrict+6);
         printf("-------------------------------------");
-        toxy(Lstrict, Upstrict+7);
+        toxy(X_COORD+Lstrict, Upstrict+7);
         printf("| 1.³äÖµ |");
-        toxy(Lstrict, Upstrict+9);
+        toxy(X_COORD+Lstrict, Upstrict+9);
         printf("| 2.½â¹Ò |");
-        toxy(Lstrict, Upstrict+11);
+        toxy(X_COORD+Lstrict, Upstrict+11);
         printf("| 3.²é¿´Ïû·Ñ¼ÇÂ¼ |");
-        toxy(Lstrict, Upstrict+13);
+        toxy(X_COORD+Lstrict, Upstrict+13);
         printf("| 4.ĞŞ¸ÄÃÜÂë |");
-        toxy(Lstrict, Upstrict+15);
+        toxy(X_COORD+Lstrict, Upstrict+15);
         printf("| 5.ĞŞ¸Äµç»° |");
-        toxy(Lstrict, Upstrict+17);
+        toxy(X_COORD+Lstrict, Upstrict+17);
     }
     else{
-        toxy(22,Upstrict+6);
+        toxy(X_COORD+22,Upstrict+6);
         printf("-------------------------------------");
-        toxy(Lstrict, Upstrict+7);
+        toxy(X_COORD+Lstrict, Upstrict+7);
         printf("| 1.³äÖµ |");
-        toxy(Lstrict, Upstrict+9);
+        toxy(X_COORD+Lstrict, Upstrict+9);
         printf("| 2.¹ÒÊ§ |");
-        toxy(Lstrict, Upstrict+11);
+        toxy(X_COORD+Lstrict, Upstrict+11);
         printf("| 3.²é¿´Ïû·Ñ¼ÇÂ¼ |");
-        toxy(Lstrict, Upstrict+13);
+        toxy(X_COORD+Lstrict, Upstrict+13);
         printf("| 4.ĞŞ¸ÄÃÜÂë |");
-        toxy(Lstrict, Upstrict+15);
+        toxy(X_COORD+Lstrict, Upstrict+15);
         printf("| 5.ĞŞ¸Äµç»° |");
-        toxy(Lstrict, Upstrict+17);
+        toxy(X_COORD+Lstrict, Upstrict+17);
         printf("| 6.»áÔ±µã²Í |");
-        toxy(Lstrict, Upstrict+19);
+        toxy(X_COORD+Lstrict, Upstrict+19);
     }
 }
 // ²Ù×÷·´À¡³É¹¦½çÃæ
@@ -2097,7 +2139,7 @@ void Operationok(int state){
     int time = 3;
     while(time){
         system("cls");
-        toxy(Lstrict, Upstrict+2);
+        toxy(X_COORD+Lstrict, Upstrict+2);
         if(state){
             printf("²Ù×÷³É¹¦£¡½«ÓÚ%dÃëºó·µ»Ø",time);
         }
@@ -2288,9 +2330,6 @@ void VIPoperationUSER(VIP *node){
     }
 }
 
-
-
-
 int pagef(VIP *head,int begin,int end){
     VIP *start = head,*last = head;
     int a=begin;
@@ -2345,8 +2384,6 @@ int VIPShowList(VIP *head){
     pagef(head, now*single,now*single+30);
     return all;
 }
-
-
 
 void VIPadminoperation(){
     int time = 0, money = 0;//0´ú±íÕıĞò 1´ú±íµ¹Ğò
@@ -2787,6 +2824,12 @@ void ShowVIPadmin(VIP *node){
     }
 }
 
+/*
+Ô±¹¤ÎÄ¼şµÄ¶ÁÈ¡¸ñÊ½£º
+_index,name,tel,money,password,loss(bool),position,(if(position)=1:orderlist....)
+index,name,tel,money,password,loss(bool),position,(if(position)=1:orderlist....)
+(ÏÂ»®Ïß'_'´ú±í¿Õ¸ñ)
+*/
 STAFF * STAFFReadFile(){
     //Èç¹ûÃ»ÓĞÎÄ¼ş£¬´´½¨ÎÄ¼ş
     FILE *temp = fopen("PersonStaff.txt", "a");
@@ -2853,6 +2896,12 @@ void STAFF__init__(STAFF *node){
 }
 
 // ±£´æ»áÔ±Ãûµ¥£¬²ÎÊıÎªÒ»¸öÃ»ÓĞÉÚ±ø½áµãµÄVIPĞÍÁ´±í
+/*
+Ô±¹¤ÎÄ¼şµÄĞ´Èë¸ñÊ½£º
+_index,name,tel,money,password,loss(bool),position,(if(position)=1:orderlist....)
+index,name,tel,money,password,loss(bool),position,(if(position)=1:orderlist....)
+(ÏÂ»®Ïß'_'´ú±í¿Õ¸ñ)
+*/
 void STAFFInputFile(STAFF *head){
     STAFF *p = head;
     FILE *fp = fopen("PersonStaff.txt", "w");
@@ -2901,9 +2950,9 @@ void STAFFInputFile(STAFF *head){
 
 int STAFFPosition(STAFF *node){
     system("cls");
-    toxy(Lstrict,Upstrict+1);
+    toxy(X_COORD+Lstrict,Upstrict+1);
     printf("ÇëÑ¡ÔñÖ°Î»£º");
-    toxy(Lstrict,Upstrict+2);
+    toxy(X_COORD+Lstrict,Upstrict+2);
     printf("1.·şÎñÔ± 2.µê³¤ 3.Çå½à¹¤ 4.ÊµÏ°Éú *·µ»Ø ESCÍË³ö");
     char choose=0;
     while(1){
@@ -3010,28 +3059,28 @@ int STAFFmoney(VIP *node){
         char temp[100] = {0};
         char money[100] = {0};
         printf("ESC Ê×Ò³\n *  ·µ»ØÉÏÒ»¼¶");
-        toxy(28, 8);
+        toxy(X_COORD+28, 8);
         printf("     Ê±ÉĞÅİ°ÉĞÅÏ¢¹ÜÀíÏµÍ³");
-        toxy(22,9);
+        toxy(X_COORD+22,9);
         printf("-------------------------------------");
-        toxy(Lstrict, Upstrict+1);
+        toxy(X_COORD+Lstrict, Upstrict+1);
         strcpy(temp, "ÇëÊäÈëÔ±¹¤¹¤×Ê£º");
         printf("%s", temp);
         int lentel = strlen(temp);
         if(attation)
             Warning_Type;
-        toxy(Lstrict, Upstrict+2);
+        toxy(X_COORD+Lstrict, Upstrict+2);
         printf("×¢Òâ£¡");
-        toxy(Lstrict, Upstrict+3);
+        toxy(X_COORD+Lstrict, Upstrict+3);
         printf("²»µÃ¶àÓÚ20¸ö×Ö·û");
-        toxy(Lstrict, Upstrict+4);
+        toxy(X_COORD+Lstrict, Upstrict+4);
         printf("½ö¿ÉÊäÈë½ğ¶î");
-        toxy(Lstrict, Upstrict+5);
+        toxy(X_COORD+Lstrict, Upstrict+5);
         if(attation){
             Normal_Type;
             printf("ÇëÖØÊÔ£¡");
         }
-        toxy(Lstrict + lentel + 1, Upstrict+1);
+        toxy(X_COORD+Lstrict + lentel + 1, Upstrict+1);
         char c=1;
         int i = 0;
         while (c)
@@ -3097,7 +3146,7 @@ int STAFFShowList(STAFF *head){
     system("cls");
     STAFF *cur = head;
     if(cur == NULL){
-        printf("ÔİÎŞÔ±¹¤ĞÅÏ¢");
+        printf("                                                            ÔİÎŞÔ±¹¤ĞÅÏ¢");
         return 0;
     }
     int index = 1;
@@ -3126,7 +3175,7 @@ int STAFFShowList(STAFF *head){
 void STAFFadminoperation(){
     int money = 0, time = 0;
     while(1){
-        system("cls");//´òÓ¡½çÃæ
+        system("cls");  //´òÓ¡½çÃæ
         STAFFShowList(head_staff);
         printf("\n\n\n");
         printf("1.Ôö¼ÓÔ±¹¤ 2.×¢ÏúÔ±¹¤ 3.ĞŞ¸Ä/²é¿´Ô±¹¤ÏêÏ¸ĞÅÏ¢ 4.Ê±¼äÅÅĞò 5.¹¤×ÊÅÅĞò ESC.·µ»ØÖ÷²Ëµ¥ *·µ»Ø\n");
@@ -3135,11 +3184,13 @@ void STAFFadminoperation(){
             fflush(stdin);
             choose = getch();
             fflush(stdin);
-            switch(choose){
+            switch(choose)
+            {
                 case '1':
                     system("cls");
                     head_staff = STAFFadd(head_staff);
-                    if(flag_come_back){
+                    if(flag_come_back)
+                    {
                         return;
                     }
                     break;
@@ -3166,7 +3217,8 @@ void STAFFadminoperation(){
             }
             break;
         }
-        if(flag_come_back){
+        if(flag_come_back)
+        {
             return;
         }
     }
@@ -3351,7 +3403,7 @@ void ModandShowstaffDetail(STAFF *head, int version){
                         }
                         else{
                             system("cls");
-                            toxy(Lstrict, Upstrict);
+                            toxy(X_COORD+Lstrict, Upstrict);
                             printf("±§Ç¸£¡ÄãÎŞÈ¨ÏŞ");
                         }
                         break;
@@ -3404,27 +3456,24 @@ void ShowSTAFFadmin(STAFF *node){
     }
 }
 
-
-
-
 void STAFFUSERshow(VIP *node){
     if(node==NULL)
         return;
     system("cls");
     printf("ESC Ê×Ò³\n *  ·µ»ØÉÏÒ»¼¶");
-    toxy(28, 8);
+    toxy(X_COORD+28, 8);
     printf("     Ê±ÉĞÅİ°É»áÔ±ÏµÍ³");
-    toxy(22,9);
+    toxy(X_COORD+22,9);
     printf("-------------------------------------");
-    toxy(Lstrict, Upstrict+1);
+    toxy(X_COORD+Lstrict, Upstrict+1);
     printf("¹¤ºÅ£º", node->id.id);
-    toxy(Lstrict, Upstrict + 2);
+    toxy(X_COORD+Lstrict, Upstrict + 2);
     printf("ĞÕÃû£º%s",node->name);
-    toxy(Lstrict, Upstrict+3);
+    toxy(X_COORD+Lstrict, Upstrict+3);
     printf("µç»°£º%s",node->tel);
-    toxy(Lstrict, Upstrict+4);
+    toxy(X_COORD+Lstrict, Upstrict+4);
     printf("¹¤×Ê£º%.2f",node->restmoney);
-    toxy(Lstrict, Upstrict+5);
+    toxy(X_COORD+Lstrict, Upstrict+5);
     printf("Ö°Î»£º");
     switch (node->position)
     {
@@ -3444,28 +3493,27 @@ void STAFFUSERshow(VIP *node){
             break;
     }
     if(node->position==1){
-        toxy(22,Upstrict+6);
+        toxy(X_COORD+22,Upstrict+6);
         printf("-------------------------------------");
-        toxy(Lstrict, Upstrict+7);
+        toxy(X_COORD+Lstrict, Upstrict+7);
         printf("| 1.ĞŞ¸ÄµÇÂ¼ÃÜÂë |");
-        toxy(Lstrict, Upstrict+9);
+        toxy(X_COORD+Lstrict, Upstrict+9);
         printf("| 2.ĞŞ¸ÄÊÖ»úºÅ |");
-        toxy(Lstrict, Upstrict+11);
+        toxy(X_COORD+Lstrict, Upstrict+11);
         printf("| 3.²é¿´Òµ¼¨ |");
-        toxy(Lstrict, Upstrict+13);
+        toxy(X_COORD+Lstrict, Upstrict+13);
         printf("| 4.µã²Í |");
-        toxy(Lstrict, Upstrict+15);
+        toxy(X_COORD+Lstrict, Upstrict+15);
         printf("| 5.»áÔ±×¢²á |");
-        toxy(Lstrict, Upstrict+17);
+        toxy(X_COORD+Lstrict, Upstrict+17);
         printf("| 6.»áÔ±µÇÂ¼ |");
     }
     else{
-        printf("\nÇëÊäÈë²Ù×÷£º1. ĞŞ¸ÄµÇÂ¼ÃÜÂë 2.ĞŞ¸ÄÊÖ»úºÅ *·µ»Ø ESC.ÍË³öµÇÂ¼\n");
-        toxy(22,Upstrict+6);
+        toxy(X_COORD+22,Upstrict+6);
         printf("-------------------------------------");
-        toxy(Lstrict, Upstrict+7);
+        toxy(X_COORD+Lstrict, Upstrict+7);
         printf("| 1.ĞŞ¸ÄµÇÂ¼ÃÜÂë |");
-        toxy(Lstrict, Upstrict+9);
+        toxy(X_COORD+Lstrict, Upstrict+9);
         printf("| 2.ĞŞ¸ÄÊÖ»úºÅ |");
     }
 }
@@ -3506,7 +3554,7 @@ void STAFFoperationUSER(STAFF *node){
                         system("cls");
                         node_STAFF = node;
                         printf("ESC Ê×Ò³\n *  ·µ»ØÉÏÒ»¼¶");
-                        toxy(Lstrict, Upstrict);
+                        toxy(X_COORD+Lstrict, Upstrict);
                         printf("µã²Í¹Ë¿ÍÊÇ»áÔ±Âğ£¿£¨Y/N£©");
                         VIP *result = NULL;//result 0 µÇÂ¼Ê§°Ü node³É¹¦
                         int YN = inputYorN();
@@ -3821,14 +3869,30 @@ void Add_VIPOrders(VIP *node,Complete_Form * cf){
 
 void Inventory_Manage()  //¿â´æ¹ÜÀíÒ³Ãæ
 {
+    system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
     system("cls");  //ÇåÆÁ
+    HideCursor(0);  //Òş²Ø¹â±ê
     char t;  //´æ´¢ÓÃ»§Ñ¡Ôñ
-    toxy(12,6);
-    printf("ÇëÑ¡ÔñĞèÒª½øĞĞµÄ²Ù×÷:\n");
-    printf("\t\t°´ÏÂesc¼ü·µ»ØÖ÷Ò³Ãæ\n");
-    printf("\t\t1.Ôö¼Ó¿â´æ\n");
-    printf("\t\t2.²é¿´¿â´æÏûºÄ\n");
-    printf("\t\t0.·µ»ØÉÏÒ»¼¶");
+    toxy(X_COORD+28,8);
+    printf("  Ê±ÉĞÅİ°É¿â´æ¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+30,10);
+    printf("| 1.Ôö¼Ó¿â´æ");
+    toxy(X_COORD+48,10);
+    printf("|");
+    toxy(X_COORD+30,12);
+    printf("| 2.²é¿´¿â´æÏûºÄ");
+    toxy(X_COORD+48,12);
+    printf("|");
+    toxy(X_COORD+30,14);
+    printf("| 0.·µ»ØÉÏÒ»¼¶");
+    toxy(X_COORD+48,14);
+    printf("|");
+    toxy(X_COORD+30,16);
+    printf("| ESC.·µ»ØÖ÷Ò³Ãæ");
+    toxy(X_COORD+48,16);
+    printf("|");
     fflush(stdin);
     t = getch();
     fflush(stdin);
@@ -3844,10 +3908,12 @@ void Inventory_Manage()  //¿â´æ¹ÜÀíÒ³Ãæ
             ROOT();
             break;
         case 27:
+            RootPasswordFlag = 1;
             Default();
             break;
         default:
-            printf("\t\tÊäÈë²»ºÏ¹æ£¬ÇëÖØĞÂÊäÈë");  //µİ¹éÖ±ÖÁÊäÈëºÏ¹æ
+            toxy(X_COORD+30,18);
+            printf("Çë¸ù¾İ±êºÅ½øĞĞÑ¡Ôñ");
             Inventory_Manage();
             break;
     }
@@ -3856,16 +3922,21 @@ void Inventory_Manage()  //¿â´æ¹ÜÀíÒ³Ãæ
 
 void Add_Inventory()  //Ìí¼Ó¿â´æ
 {
+    system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
+    system("cls");  //ÇåÆÁ
+    HideCursor(1);  //ÏÔÊ¾¹â±ê
     int inventory_num;  //¿â´æÖÖÀàÊıÁ¿
     int enter_id;  //ÓÃ»§ÊäÈëµÄid
     char enter_choose;  //ÓÃ»§Ñ¡ÔñÌí¼ÓµÄÁ¿
     Material* operate_material;  //½øĞĞÌí¼Ó²Ù×÷µÄÔ­²ÄÁÏ½á¹¹Ìå¶ÔÓ¦µÄÖ¸Õë(id¶ÔÓ¦µÄÔ­²ÄÁÏ½á¹¹Ìå)
-    system("cls");  //ÇåÆÁ
-    toxy(12,6);
-    printf("ÇëÑ¡ÔñÒªÌí¼ÓµÄÔ­²ÄÁÏÖÖÀà:\n");
+    toxy(X_COORD+28,8);
+    printf("  Ê±ÉĞÅİ°É¿â´æ¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+27,11);
+    printf("ÇëÑ¡ÔñÒªÌí¼ÓµÄÔ­²ÄÁÏ:");
     inventory_num = Show_Inventory();
     char ch[Max_User_Enter];
-    printf("\t\tÇëÊäÈëÒûÆ·¶ÔÓ¦µÄid½øĞĞÑ¡Ôñ:");
     fflush(stdin);
     scanf("%s",ch);
     fflush(stdin);
@@ -3875,15 +3946,26 @@ void Add_Inventory()  //Ìí¼Ó¿â´æ
         enter_id = x;
         HideCursor(0);
     }
+    else if(x==0)
+    {
+        Inventory_Manage();
+        return;
+    }
     else if(x==-1)
     {
-        printf("\t\tÊäÈëÊı×Ö³¬¹ı×î´óÁ¿");
+        HideCursor(0);
+        toxy(X_COORD+21,35);
+        printf("ÊäÈëÊı×Ö³¬¹ı×î´óÁ¿,Çë1sºóÖØĞÂÑ¡Ôñ");
+        Sleep(1000);
         Add_Inventory();  //µİ¹éÖ±ÖÁÊäÈëºÏ¹æ
         return;
     }
     else if(x==-2)
     {
-        printf("\t\tÊäÈëÄÚÈİ²»ºÏ¹æ£¬ÇëÊäÈëÊı×Ö");
+        HideCursor(0);
+        toxy(X_COORD+21,35);
+        printf("ÊäÈëÄÚÈİ²»ºÏ¹æ,Çë1sºóÖØĞÂÊäÈëÔ­²ÄÁÏ¶ÔÓ¦µÄID");
+        Sleep(1000);
         Add_Inventory();  //µİ¹éÖ±ÖÁÊäÈëºÏ¹æ
         return;
     }
@@ -3895,33 +3977,68 @@ void Add_Inventory()  //Ìí¼Ó¿â´æ
 int Show_Inventory()
 {
     int max_id;
+    int x1=22,x2=34,x3=46,y=13;  //¹â±êËùÔÚµÄÎ»ÖÃ×ø±ê
     if(head_material->next==NULL)
     {
+        toxy(X_COORD+x1,y);
+        printf("ÔİÎŞÔ­²ÄÁÏ...ÇëÁªÏµ¹ÜÀíÔ±½øĞĞÌí¼Ó");
         return 0;
     }
     Material *m;
     m = head_material->next;
-    printf("\t\tID  \t Ô­²ÄÁÏÃû\tÊ£Óà¿â´æÁ¿\n");
+    toxy(X_COORD+x1,y);
+    printf("Ô­²ÄÁÏID");
+    toxy(X_COORD+x2,y);
+    printf("Ô­²ÄÁÏÃû");
+    toxy(X_COORD+x3,y);
+    printf("Ê£Óà¿â´æÁ¿");
     while(m!=NULL)
     {
-        printf("\t\t%d\t  %s  \t%.2f\n",m->id,m->name,m->inventory);
+        y+=1;
+        toxy(X_COORD+x1+2,y);
+        printf("%d",m->id);
+        toxy(X_COORD+x2,y);
+        printf("%s",m->name);
+        toxy(X_COORD+x3+2,y);
+        printf("%.2f",m->inventory);
         max_id = m->id;
         m = m->next;
     }
+    y+=1;
+    toxy(X_COORD+x1,y);
+    printf("ÊäÈë0·µ»ØÉÏÒ»¼¶");
+    y+=1;
+    toxy(X_COORD+x1,y);
+    printf("ÊäÈëÔ­²ÄÁÏµÄID½øĞĞÑ¡Ôñ(°´»Ø³µÈ·ÈÏ)£º");
     return max_id;
 }
 
 void Show_InventoryConsumption()  //²é¿´¿â´æÏûºÄ
 {
-    char t;
+    system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
     system("cls");  //ÇåÆÁ
-    toxy(12,6);
-    HideCursor(0);
-    printf("ÇëÑ¡Ôñ²é¿´¿â´æÏûºÄµÄ¹Ø¼ü´Ê:\n");
-    printf("\t\t°´ÏÂesc¼ü·µ»ØÖ÷Ò³Ãæ\n");
-    printf("\t\t1.°´ÏûºÄÁ¿½øĞĞÅÅĞò\n");
-    printf("\t\t2.°´Ô­²ÄÁÏid½øĞĞÅÅĞò\n");
-    printf("\t\t0.·µ»ØÉÏÒ»¼¶\n");
+    HideCursor(0);  //Òş²Ø¹â±ê
+    char t;
+    toxy(X_COORD+28,8);
+    printf("  Ê±ÉĞÅİ°É¿â´æ¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+30,10);
+    printf("| 1.°´ÏûºÄÅÅĞò");
+    toxy(X_COORD+48,10);
+    printf("|");
+    toxy(X_COORD+30,12);
+    printf("| 2.°´IDÅÅĞò");
+    toxy(X_COORD+48,12);
+    printf("|");
+    toxy(X_COORD+30,14);
+    printf("| 0.·µ»ØÉÏÒ»¼¶");
+    toxy(X_COORD+48,14);
+    printf("|");
+    toxy(X_COORD+30,16);
+    printf("| ESC.·µ»ØÖ÷Ò³Ãæ");
+    toxy(X_COORD+48,16);
+    printf("|");
     fflush(stdin);
     t = getch();  //±£´æÓÃ»§Ñ¡Ôñ
     fflush(stdin);
@@ -3930,10 +4047,10 @@ void Show_InventoryConsumption()  //²é¿´¿â´æÏûºÄ
     {
         case '1':
             Show_Inventory_ByConsumption();
-            break;
+            return;
         case '2':
             Show_Inventory_ById();
-            break;
+            return;
         case '0':
             Inventory_Manage();
             return;
@@ -3941,7 +4058,8 @@ void Show_InventoryConsumption()  //²é¿´¿â´æÏûºÄ
             Default();
             return;
         default:
-            printf("\t\tÊäÈë²»ºÏ¹æ£¬ÇëÖØĞÂÊäÈë");
+            toxy(X_COORD+30,18);
+            printf("Çë¸ù¾İ±êºÅ½øĞĞÑ¡Ôñ");
             Show_InventoryConsumption(); //µİ¹éÖ±ÖÁÊäÈëºÏ¹æ
             return;
     }
@@ -3950,29 +4068,61 @@ void Show_InventoryConsumption()  //²é¿´¿â´æÏûºÄ
 
 void Inventory_GetAdded(Material *m)  //ÓÃ»§Ñ¡ÔñÌí¼ÓµÄÁ¿£¬·µ»ØÓÃ»§µÄÑ¡Ôñ(1---1kg£¬2---¼ÓÖÁ°ëÂú£¬3---¼ÓÂú)
 {
+    system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
+    system("cls");  //ÇåÆÁ
+    HideCursor(0);  //Òş²Ø¹â±ê
     char t;
-    system("cls");
-    toxy(12,6);
-    printf("ÇëÑ¡ÔñÌí¼ÓµÄÁ¿:\n");
-    printf("\t\t°´ÏÂesc¼ü·µ»ØÖ÷Ò³Ãæ\n");
-    printf("\t\t1.Ìí¼ÓÖÁÒ»°ë(5kg)\n");
-    printf("\t\t2.Ìí¼ÓÖÁÂú(10kg)\n");
-    printf("\t\t0.·µ»ØÉÏÒ»¼¶\n");
+    toxy(X_COORD+28,8);
+    printf("  Ê±ÉĞÅİ°É¿â´æ¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+30,10);
+    printf("| 1.Ìí¼ÓÖÁÒ»°ë(5kg)");
+    toxy(X_COORD+48,10);
+    printf("|");
+    toxy(X_COORD+30,12);
+    printf("| 2.Ìí¼ÓÖÁÂú(10kg)");
+    toxy(X_COORD+48,12);
+    printf("|");
+    toxy(X_COORD+30,14);
+    printf("| 0.·µ»ØÉÏÒ»¼¶");
+    toxy(X_COORD+48,14);
+    printf("|");
+    toxy(X_COORD+30,16);
+    printf("| ESC.·µ»ØÖ÷Ò³Ãæ");
+    toxy(X_COORD+48,16);
+    printf("|");
     fflush(stdin);
     t = getch();
     fflush(stdin);
     switch(t)
     {
         case '1':
-            m->inventory = 5.0;
-            printf("\t\t%s¿â´æÒÑÌí¼ÓÖÁÒ»°ë!!!",m->name);
-            Sleep(1000);
-            break;
+            if(m->inventory<5.0)
+            {
+                m->inventory = 5.0;
+                toxy(X_COORD+30,18);
+                printf("%s¿â´æÒÑÌí¼ÓÖÁÒ»°ë!!!",m->name);
+            }
+            else
+            {
+                toxy(X_COORD+30,18);
+                printf("%s¿â´æ³¬¹ıÒ»°ë£¬Ìí¼ÓÊ§°Ü",m->name);
+            }
+            toxy(X_COORD+30,19);
+            printf("2Ãëºó×Ô¶¯·µ»Ø¿â´æ¹ÜÀíÒ³Ãæ");
+            Sleep(2000);
+            Inventory_Manage();
+            return;
         case '2':
+            toxy(X_COORD+30,18);
             m->inventory = 10.0;
-            printf("\t\t%s¿â´æÒÑÌí¼ÓÖÁÂú!!!",m->name);
-            Sleep(1000);
-            break;
+            printf("%s¿â´æÒÑÌí¼ÓÖÁÂú!!!",m->name);
+            toxy(X_COORD+30,19);
+            printf("2Ãëºó×Ô¶¯·µ»Ø¿â´æ¹ÜÀíÒ³Ãæ");
+            Sleep(2000);
+            Inventory_Manage();
+            return;
         case '0':
             Add_Inventory();
             return;
@@ -3989,34 +4139,65 @@ void Inventory_GetAdded(Material *m)  //ÓÃ»§Ñ¡ÔñÌí¼ÓµÄÁ¿£¬·µ»ØÓÃ»§µÄÑ¡Ôñ(1---1kg
 
 void ChangeShowWay(Consumption *head,Consumption *tail,int status)  //¸ù¾İstatusµÄÖµÀ´Ñ¡ÔñÊÇ°´ÏûºÄÁ¿´ÓĞ¡µ½´ó£¬»¹ÊÇ°´ÏûºÄÁ¿´Ó´óµ½Ğ¡À´ÏÔÊ¾Ô­²ÄÁÏµÄ×ÜÏûºÄÁ¿(status=1Ê±ºò´ÓĞ¡µ½´ó,0Ê±´Ó´óµ½Ğ¡)
 {
-    system("cls");
-    toxy(12,6);
+    system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
+    system("cls");  //ÇåÆÁ
+    HideCursor(0);  //Òş²Ø¹â±ê
     Consumption *con;
     int i = 1; //¼ÆÊıÆ÷
-    printf("Ô­²ÄÁÏµÄÏûºÄÁ¿Îª:\n");
+    int x1=24,x2=36,x3=48,y=11;  //¹â±êËùÔÚµÄÎ»ÖÃ×ø±ê
+    toxy(X_COORD+28,8);
+    printf("  Ê±ÉĞÅİ°É¿â´æ¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+x1,y);
+    printf("Ô­²ÄÁÏID");
+    toxy(X_COORD+x2,y);
+    printf("Ô­²ÄÁÏÃû");
+    toxy(X_COORD+x3,y);
+    printf("ÏûºÄÁ¿(kg)");
     if(status == 1)
     {
         con = head;
         while(con!=NULL)
         {
-            printf("\t\t%d.%s\t%.2f\n",i,con->name,con->consumption);
+            y+=1;
+            toxy(X_COORD+x1+2,y);
+            printf("%d",i);
+            toxy(X_COORD+x2,y);
+            printf("%s",con->name);
+            toxy(X_COORD+x3+2,y);
+            printf("%.2f",con->consumption);
             con = con->next;
             i++;
         }
-        printf("\t\t°´0·µ»ØÉÏÒ»¼¶\n");
-        printf("\t\t°´1ÇĞ»»ÅÅĞò·½Ê½\n");
+        y+=1;
+        toxy(X_COORD+x1,y+1);
+        printf("°´0·µ»ØÉÏÒ»¼¶");
+        y+=1;
+        toxy(X_COORD+x1,y+1);
+        printf("°´1ÇĞ»»ÅÅĞò·½Ê½");
     }
     else
     {
         con = tail;
-        while(con!=NULL)
+        while(con!=NULL&&i!=19)
         {
-            printf("\t\t%d.%s\t%.2f\n",i,con->name,con->consumption);
+            y+=1;
+            toxy(X_COORD+x1+2,y);
+            printf("%d",i);
+            toxy(X_COORD+x2,y);
+            printf("%s",con->name);
+            toxy(X_COORD+x3+2,y);
+            printf("%.2f",con->consumption);
             con = con->pre;
             i++;
         }
-        printf("\t\t°´0·µ»ØÉÏÒ»¼¶\n");
-        printf("\t\t°´1ÇĞ»»ÅÅĞò·½Ê½\n");
+        y+=1;
+        toxy(X_COORD+x1,y);
+        printf("°´0·µ»ØÉÏÒ»¼¶");
+        y+=1;
+        toxy(X_COORD+x1,y);
+        printf("°´1ÇĞ»»ÅÅĞò·½Ê½");
     }
     return;
 }
@@ -4038,16 +4219,17 @@ Consumption* SortLinkList(Consumption *h)  //´´½¨Ò»¸öÒÔhÎªÍ·½áµã(·ÇÉÚÎ»½áµã)µÄË«
     m->pre = soldier;  //½«h½áµãµÄ¸±±¾m½ÓÔÚĞÂÁ´±íµÄÉÚÎ»½áµãºóÃæ
     m->next = NULL;
     soldier->next = m;
-    while(h->next!=NULL)  //²åÈëÅÅĞò
+    h = h->next;
+    while(h!=NULL)  //²åÈëÅÅĞò
     {
         Consumption *q;  //ÏÂÒ»¸ö½áµãµÄ¸±±¾
         Consumption *n;  //Óëm×é³ÉË«Ö¸ÕëÀ´½øĞĞ²åÈëÅÅĞò
         m = soldier;
         n = soldier->next;
         q = (Consumption *)malloc(sizeof(Consumption));
-        q->id = h->next->id;
-        q->consumption = h->next->consumption;
-        strcpy(q->name,h->next->name);
+        q->id = h->id;
+        q->consumption = h->consumption;
+        strcpy(q->name,h->name);
         q->next = NULL;
         q->pre = NULL;
         while(q->consumption > n->consumption&&n!=NULL)  //Ñ­»·ÎªĞÂ½áµãqÕÒµ½ºÏÊÊÎ»ÖÃ
@@ -4110,19 +4292,37 @@ void Show_Inventory_ByConsumption()  //¸ù¾İÔ­²ÄÁÏÏûºÄÁ¿¶ÔÔ­²ÄÁÏµÄÏûºÄ½øĞĞÅÅĞòÕ¹Ê
 
 void Show_Inventory_ById()  //¸ù¾İÔ­²ÄÁÏµÄidÕ¹Ê¾¸÷²ÄÁÏµÄÏûºÄÁ¿
 {
-    char t;
-    Consumption* con;
+    system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
     system("cls");  //ÇåÆÁ
-    toxy(12,6);
-    HideCursor(0);
-    printf("Ô­²ÄÁÏÃû\tÏûºÄÁ¿(kg)\n");
+    HideCursor(0);  //Òş²Ø¹â±ê
+    char t;
+    int x1=24,x2=36,x3=48,y=11;  //¹â±êËùÔÚµÄÎ»ÖÃ×ø±ê
+    Consumption* con;
+    toxy(X_COORD+28,8);
+    printf("  Ê±ÉĞÅİ°É¿â´æ¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+x1,y);
+    printf("Ô­²ÄÁÏID");
+    toxy(X_COORD+x2,y);
+    printf("Ô­²ÄÁÏÃû");
+    toxy(X_COORD+x3,y);
+    printf("ÏûºÄÁ¿(kg)");
     con = head_consumption->next;
     while(con!=NULL)
     {
-        printf("\t\t%d.%s\t%.2f\n",con->id,con->name,con->consumption);
+        y+=1;
+        toxy(X_COORD+x1+2,y);
+        printf("%d",con->id);
+        toxy(X_COORD+x2,y);
+        printf("%s",con->name);
+        toxy(X_COORD+x3+2,y);
+        printf("%.2f",con->consumption);
         con = con->next;
     }
-    printf("\t\t°´0·µ»ØÉÏÒ»¼¶\n");
+    y+=1;
+    toxy(X_COORD+x1,y+1);
+    printf("°´0·µ»ØÉÏÒ»¼¶");
     while(1)
     {
         fflush(stdin);
@@ -4212,28 +4412,20 @@ Consumption* Create_ConsumptionLinkList()  //´´½¨Ô­²ÄÁÏÏûºÄµÄË«ÏòÁ´±í,°´Ô­²ÄÁÏid
     return h;
 }
 
-//////////////////////////////////////////////////////////////////////
-//ÍõË¸Æå
-void ShowMonthSales(int a);
-void ShowSeasonSales(int a);
-void ShowYearSales(int a);
-void Check_Month_Sales();//¶ÁÈ¡head_formÁ´±íÀïÃæµÄ½áµãÀïµÄÊı¾İ¡£Êı×é±£´æÏàÓ¦IDµÄÏúÁ¿£¬±ÈÈça[1]´ú±íµÚÒ»¸öÒûÁÏµÄÏúÁ¿£¬µ«ÊÇÕâÀïÓĞÒ»¸öbug¾ÍÊÇ¶Áµ½ÁËÕâ¸öÊı×éµÄµÚ10¸öÔªËØÎª2£¬µ«ÊÇÒÑ¾­É¾µôÁËÕâ¸ö £¬ÄÇÃ´¾Í²»Õ¹Ê¾¡£
-void Check_Season_Sales();
-void Check_Year_Sales();
-void ShowSale();
-void AddGoods();
-void DeleteGoods();
-void ManageGoods();
-void ChangeGoods();//ÔöÉ¾ÉÌÆ·ÖÖÀà¡£
-
 void ShowMonthSales(int a)
 {
-    printf("%dÔÂ·İ¸÷ÖÖÒûÆ·µÄÏúÁ¿ÈçÏÂ£º\n",a);
+    toxy(X_COORD+28,8);
+    printf("   Ê±ÉĞÅİ°ÉÏúÁ¿¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+27,11);
+    printf(" %dÔÂ·İ¸÷ÖÖÒûÆ·µÄÏúÁ¿ÈçÏÂ£º\n",a);
+    toxy(X_COORD+27,12);
     printf("---------------------------\n");
-
     for(int j=0;j<Total_Beverage_Num;j++)//ÏÈ±éÀúÊı×é£¬Èç¹ûÏúÁ¿Îª0Ôò²»Êä³ö£¨¼´Êı×éÀï¶ÔÓ¦ÏÂ±êµÄÊıÖµ=0£¬Èç¹ûÎª0Êä³öµÄ»°ÄÇÃ´¶àÓàµÄ¿Õ¼ä¾ÍÈ«Êä³öÁË£¬ÓĞ30¸ö¿Õ¼äÄØ£©£¬Èç¹û²éÕÒÕâ¸öid·¢ÏÖÃ»ÓĞÕâ¸öÃû×Ö£¬Ò²²»Êä³ö¡£
     {
         //printf("idÎª%dµÄ4ÔÂÏúÁ¿Îª£º%d\n",j+1,month[4][j+1]);//½ÓÏÂÀ´ÕÒid¶ÔÓ¦µÄÃû×Ö¡£
+        toxy(X_COORD+27,13+j);
         Beverage*d=Find_Beverage(j+1,head_beverage);//·µ»ØµÄÊÇÖ¸ÏòÕâ¸ö½á¹¹ÌåµÄÖ¸Õë
         printf("%sµÄ%dÔÂÏúÁ¿Îª£º%d\n",d->name,a,month[a][j+1]);
     }
@@ -4250,12 +4442,19 @@ void ShowSeasonSales(int a)
         case 4:strcat(b,"¶¬¼¾");break;
     }
 
+    toxy(X_COORD+28,8);
+    printf("   Ê±ÉĞÅİ°ÉÏúÁ¿¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+27,11);
     printf("%s¸÷ÖÖÒûÆ·µÄÏúÁ¿ÈçÏÂ£º\n",b);
+    toxy(X_COORD+27,12);
     printf("---------------------------\n");
 
     for(int j=0;j<Total_Beverage_Num;j++)//ÏÈ±éÀúÊı×é£¬Èç¹ûÏúÁ¿Îª0Ôò²»Êä³ö£¨¼´Êı×éÀï¶ÔÓ¦ÏÂ±êµÄÊıÖµ=0£¬Èç¹ûÎª0Êä³öµÄ»°ÄÇÃ´¶àÓàµÄ¿Õ¼ä¾ÍÈ«Êä³öÁË£¬ÓĞ30¸ö¿Õ¼äÄØ£©£¬Èç¹û²éÕÒÕâ¸öid·¢ÏÖÃ»ÓĞÕâ¸öÃû×Ö£¬Ò²²»Êä³ö¡£
     {
         //printf("idÎª%dµÄ4ÔÂÏúÁ¿Îª£º%d\n",j+1,month[4][j+1]);//½ÓÏÂÀ´ÕÒid¶ÔÓ¦µÄÃû×Ö¡£
+        toxy(X_COORD+27,13+j);
         Beverage*d=Find_Beverage(j+1,head_beverage);//·µ»ØµÄÊÇÖ¸ÏòÕâ¸ö½á¹¹ÌåµÄÖ¸Õë
         printf("%sµÄ%sÏúÁ¿Îª£º%d\n",d->name,b,season[a][j+1]);
     }
@@ -4263,15 +4462,21 @@ void ShowSeasonSales(int a)
 
 void ShowYearSales(int a)
 {
-
-    printf("±¾Äê¸÷ÖÖÒûÆ·µÄÏúÁ¿ÈçÏÂ£º\n");
+    toxy(X_COORD+28,8);
+    printf("   Ê±ÉĞÅİ°ÉÏúÁ¿¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+27,11);
+    printf("ÉÏÒ»Äê¸÷ÖÖÒûÆ·µÄÏúÁ¿ÈçÏÂ£º\n");//ÕâÀïÒª¸ù¾İaÅĞ¶ÏÊÇ±¾Äê¶È»¹ÊÇÉÏÒ»Äê¶È£¬ÓÃswitch case½â¾ö
+    toxy(X_COORD+27,12);
     printf("---------------------------\n");
 
     for(int j=0;j<Total_Beverage_Num;j++)//ÏÈ±éÀúÊı×é£¬Èç¹ûÏúÁ¿Îª0Ôò²»Êä³ö£¨¼´Êı×éÀï¶ÔÓ¦ÏÂ±êµÄÊıÖµ=0£¬Èç¹ûÎª0Êä³öµÄ»°ÄÇÃ´¶àÓàµÄ¿Õ¼ä¾ÍÈ«Êä³öÁË£¬ÓĞ30¸ö¿Õ¼äÄØ£©£¬Èç¹û²éÕÒÕâ¸öid·¢ÏÖÃ»ÓĞÕâ¸öÃû×Ö£¬Ò²²»Êä³ö¡£
     {
         //printf("idÎª%dµÄ4ÔÂÏúÁ¿Îª£º%d\n",j+1,month[4][j+1]);//½ÓÏÂÀ´ÕÒid¶ÔÓ¦µÄÃû×Ö¡£
+        toxy(X_COORD+27,13+j);
         Beverage*d=Find_Beverage(j+1,head_beverage);//·µ»ØµÄÊÇÖ¸ÏòÕâ¸ö½á¹¹ÌåµÄÖ¸Õë
-        printf("%sµÄ±¾ÄêÏúÁ¿Îª£º%d\n",d->name,year[a][j+1]);
+        printf("%sµÄÉÏÒ»ÄêÏúÁ¿Îª£º%d\n",d->name,year[a][j+1]);
     }
 }
 
@@ -4286,12 +4491,16 @@ void Check_Month_Sales()//¶ÁÈ¡head_formÁ´±íÀïÃæµÄ½áµãÀïµÄÊı¾İ¡£Êı×é±£´æÏàÓ¦IDµÄÏ
     while(c->next!=NULL)//Éè¼ÆË¼Â·£º±éÀúformÁ´±íµÄËùÓĞ½áµã£¬ÔÚÔÂµÄ¶şÎ¬Êı×éÖĞ£¬°Ñ½áµãÀïÃæµÄÈÕÆÚµÄÔÂ·İ×÷ÎªĞĞ£¬±éÀúform½áµãÀïµÄµ¥¸ö¶©µ¥½á¹¹ÌåÊı×é£¬ÔÚÊı×éÀïÃæÕÒid£¬ÔÚ¶şÎ¬Êı×éÁĞÀïµÄ¶ÔÓ¦idµØ·½½øĞĞ++¼ÆÊı¡£
     {
         c=c->next;
+        //ÕâÀï±éÀúËùÓĞµÄ½áµã»¹Òª·Ö±æÕâ¸öÊÇ·ñÊÇ2020Äê¡£
 
         for(int i=0;i<c->number;i++)
         {
-            row=c->forms[i].beverage;
-            line=c->id.month;
-            month[line][row]++;//line±íÊ¾ÔÂ·İ£¬row±íÊ¾ÉÌÆ·id¡£µ«ÊÇÉÌÆ·idÊÇ´Ó1¿ªÊ¼µÄ£¬ËùÒÔmonth[line][0]ÊÇÊ²Ã´¶¼Ã»ÓĞ
+            if(c->id.year==2020)
+            {
+                row=c->forms[i].beverage;
+                line=c->id.month;
+                month[line][row]++;//line±íÊ¾ÔÂ·İ£¬row±íÊ¾ÉÌÆ·id¡£µ«ÊÇÉÌÆ·idÊÇ´Ó1¿ªÊ¼µÄ£¬ËùÒÔmonth[line][0]ÊÇÊ²Ã´¶¼Ã»ÓĞ
+            }
         }
     }//Õâ¸öĞ´Èë¶şÎ¬Êı×éÓ¦¸ÃÔÚcheckº¯ÊıÀïÃæĞ´»¹ÊÇÔÚÖ÷º¯ÊıÀïÃæĞ´±È½ÏºÃ¡£
 
@@ -4305,11 +4514,23 @@ void Check_Month_Sales()//¶ÁÈ¡head_formÁ´±íÀïÃæµÄ½áµãÀïµÄÊı¾İ¡£Êı×é±£´æÏàÓ¦IDµÄÏ
 //    }
 //    system("pause");
 
-    while(1)
+    while(1)//Ã»¾ÓÖĞÏÔÊ¾
     {
         system("CLS");
-        printf("ÇëÊäÈëÄãÒª²é¿´µÄÔÂ·İ£º(0ÍË³ö)\n");
+
+        toxy(X_COORD+28,8);
+        printf("   Ê±ÉĞÅİ°ÉÏúÁ¿¹ÜÀíÏµÍ³");
+        toxy(X_COORD+22,9);
+        printf("-------------------------------------");
+        toxy(X_COORD+27,11);
+        printf("ÇëÊäÈë2020ÄêÄãÒª²é¿´µÄÔÂ·İ(0ÍË³ö)£º\n");
+//        printf("1.1ÔÂ·İ");
+//        printf("2.2ÔÂ·İ");
+//        printf("3.3ÔÂ·İ");
+//        printf("4.4ÔÂ·İ");
+//        printf("5.5ÔÂ·İ");
         fflush(stdin);
+        toxy(X_COORD+62,11);
         scanf("%s",a);
         fflush(stdin);
         system("CLS");
@@ -4319,21 +4540,26 @@ void Check_Month_Sales()//¶ÁÈ¡head_formÁ´±íÀïÃæµÄ½áµãÀïµÄÊı¾İ¡£Êı×é±£´æÏàÓ¦IDµÄÏ
             ShowSale();
         }
 
-        b=Check_Number(a,12,2);
+        b=Check_Number(a,5,1);
 
 
         if(b==-1||b==-2)
         {
-            printf("ÇëÊäÈëÊı×Ö0-12£¡\n");
-            Sleep(2);
+            toxy(X_COORD+28,8);
+            printf("   Ê±ÉĞÅİ°ÉÏúÁ¿¹ÜÀíÏµÍ³");
+            toxy(X_COORD+22,9);
+            printf("-------------------------------------");
+            toxy(X_COORD+27,11);
+            printf("ÇëÊäÈëÊı×Ö0-5£¡\n");
+            Sleep(1000);
             system("CLS");
             Check_Month_Sales();
         }
         else
         {
             ShowMonthSales(b);
-            printf("--------------------------\n");
-            printf("\nÇë°´ÈÎÒâ¼ü¼ÌĞø£¡\n");
+            printf("\t\t\t\t\t\t\t\t--------------------------\n");
+            printf("\t\t\t\t\t\t\t\tÇë°´ÈÎÒâ¼ü¼ÌĞø£¡\n");
             getch();
         }
     }
@@ -4352,36 +4578,47 @@ void Check_Season_Sales()
     {
         c=c->next;
 
-        for(int i=0;i<c->number;i++)
+        if(c->id.year==2020)
         {
-            row=c->forms[i].beverage;
-            line=c->id.month;
-            switch(line)
+            for(int i=0;i<c->number;i++)
             {
-                case 1:season[1][row]++;break;
-                case 2:season[1][row]++;break;
-                case 3:season[1][row]++;break;
-                case 4:season[2][row]++;break;
-                case 5:season[2][row]++;break;
-                case 6:season[2][row]++;break;
-                case 7:season[3][row]++;break;
-                case 8:season[3][row]++;break;
-                case 9:season[3][row]++;break;
-                case 10:season[4][row]++;break;
-                case 11:season[4][row]++;break;
-                case 12:season[4][row]++;break;
+                row=c->forms[i].beverage;
+                line=c->id.month;
+                switch(line)
+                {
+                    case 1:season[1][row]++;break;
+                    case 2:season[1][row]++;break;
+                    case 3:season[1][row]++;break;
+                    case 4:season[2][row]++;break;
+                    case 5:season[2][row]++;break;
+                    case 6:season[2][row]++;break;
+                    case 7:season[3][row]++;break;
+                    case 8:season[3][row]++;break;
+                    case 9:season[3][row]++;break;
+                    case 10:season[4][row]++;break;
+                    case 11:season[4][row]++;break;
+                    case 12:season[4][row]++;break;
+                }
             }
         }
+
     }//Õâ¸öĞ´Èë¶şÎ¬Êı×éÓ¦¸ÃÔÚcheckº¯ÊıÀïÃæĞ´»¹ÊÇÔÚÖ÷º¯ÊıÀïÃæĞ´±È½ÏºÃ?
 
 
     while(1)
     {
         system("CLS");
-        printf("ÇëÊäÈëÄãÒª²é¿´µÄ¼¾¶È£¨0·µ»Ø£©£º\n1.´º¼¾\t2.ÏÄ¼¾\t3.Çï¼¾\t4.¶¬¼¾\n");
-
+        toxy(X_COORD+28,8);
+        printf("   Ê±ÉĞÅİ°ÉÏúÁ¿¹ÜÀíÏµÍ³");
+        toxy(X_COORD+22,9);
+        printf("-------------------------------------");
+        toxy(X_COORD+27,11);
+        printf("1.´º¼¾\t2.ÏÄ¼¾\t3.Çï¼¾\t4.¶¬¼¾");
+        toxy(X_COORD+27,12);
+        printf("ÇëÊäÈë2020ÄêÄãÒª²é¿´µÄ¼¾¶È£¨0·µ»Ø£©£º");
         //system("pause");
         fflush(stdin);
+        toxy(X_COORD+64,12);
         scanf("%s",a);
         fflush(stdin);
         system("CLS");
@@ -4396,8 +4633,13 @@ void Check_Season_Sales()
 
         if(b==-1||b==-2)
         {
+            toxy(X_COORD+28,8);
+            printf("   Ê±ÉĞÅİ°ÉÏúÁ¿¹ÜÀíÏµÍ³");
+            toxy(X_COORD+22,9);
+            printf("-------------------------------------");
+            toxy(X_COORD+27,11);
             printf("ÇëÊäÈëÊı×Ö0-4£¡\n");
-            Sleep(3);
+            Sleep(1000);
             system("CLS");
 
             Check_Season_Sales();
@@ -4405,8 +4647,8 @@ void Check_Season_Sales()
         else
         {
             ShowSeasonSales(b);
-            printf("--------------------------\n");
-            printf("\nÇë°´ÈÎÒâ¼ü¼ÌĞø£¡\n");
+            printf("\t\t\t\t\t\t\t\t--------------------------\n");
+            printf("\t\t\t\t\t\t\t\tÇë°´ÈÎÒâ¼ü¼ÌĞø£¡\n");
             getch();
         }
     }
@@ -4417,156 +4659,306 @@ void Check_Year_Sales()
     char a[2];
     int b;
     int line,row;//lineÎªĞĞ£¬rowÎªÁĞ
-
     Complete_Form *c=head_form;
-
     while(c->next!=NULL)//Éè¼ÆË¼Â·£º±éÀúformÁ´±íµÄËùÓĞ½áµã£¬ÔÚÔÂµÄ¶şÎ¬Êı×éÖĞ£¬°Ñ½áµãÀïÃæµÄÈÕÆÚµÄÔÂ·İ×÷ÎªĞĞ£¬±éÀúform½áµãÀïµÄµ¥¸ö¶©µ¥½á¹¹ÌåÊı×é£¬ÔÚÊı×éÀïÃæÕÒid£¬ÔÚ¶şÎ¬Êı×éÁĞÀïµÄ¶ÔÓ¦idµØ·½½øĞĞ++¼ÆÊı¡£
     {
         c=c->next;
 
-        for(int i=0;i<c->number;i++)
+        if(c->id.year==2020)
         {
-            row=c->forms[i].beverage;
-            line=c->id.month;
-            switch(line)
+            for(int i=0;i<c->number;i++)
             {
-                case 1:year[1][row]++;break;
-                case 2:year[1][row]++;break;
-                case 3:year[1][row]++;break;
-                case 4:year[1][row]++;break;
-                case 5:year[1][row]++;break;
-                case 6:year[1][row]++;break;
-                case 7:year[1][row]++;break;
-                case 8:year[1][row]++;break;
-                case 9:year[1][row]++;break;
-                case 10:year[1][row]++;break;
-                case 11:year[1][row]++;break;
-                case 12:year[1][row]++;break;
+                row=c->forms[i].beverage;
+                line=c->id.month;
+                switch(line)
+                {
+                    case 1:year[1][row]++;break;
+                    case 2:year[1][row]++;break;
+                    case 3:year[1][row]++;break;
+                    case 4:year[1][row]++;break;
+                    case 5:year[1][row]++;break;
+                    case 6:year[1][row]++;break;
+                    case 7:year[1][row]++;break;
+                    case 8:year[1][row]++;break;
+                    case 9:year[1][row]++;break;
+                    case 10:year[1][row]++;break;
+                    case 11:year[1][row]++;break;
+                    case 12:year[1][row]++;break;
+                }
             }
         }
+
     }//Õâ¸öĞ´Èë¶şÎ¬Êı×éÓ¦¸ÃÔÚcheckº¯ÊıÀïÃæĞ´»¹ÊÇÔÚÖ÷º¯ÊıÀïÃæĞ´±È½ÏºÃ?
-
-
     while(1)
     {
         system("CLS");
-        printf("ÇëÊäÈë1²é¿´±¾Äê¶ÈµÄÒûÆ·£¨0·µ»Ø£©£¡\n");
+        toxy(X_COORD+28,8);
+        printf("   Ê±ÉĞÅİ°ÉÏúÁ¿¹ÜÀíÏµÍ³");
+        toxy(X_COORD+22,9);
+        printf("-------------------------------------");
+        toxy(X_COORD+27,11);
+        printf("1.²é¿´ÉÏÒ»Äê¶ÈµÄÒûÆ·ÏúÁ¿\n");
+        toxy(X_COORD+27,12);
+        printf("0.·µ»Ø\n");
 
         fflush(stdin);
+        toxy(X_COORD+27,14);
         scanf("%s",a);
         fflush(stdin);
         system("CLS");
-
         if(strcmp(a,"0")==0)
         {
             ShowSale();
         }
-
         b=Check_Number(a,1,1);
-
-
         if(b==-1||b==-2)
         {
-            printf("ÇëÊäÈëÊı×Ö0-1£¡\n");//·¢ÏÖÒ»¸öbug£¬ÊäÈë´íÎóÖ®ºóÒª°´Á½ÏÂÒÔÉÏ0²Å¿ÉÒÔÍË³ö¡£
-            Sleep(2);
+            toxy(X_COORD+28,8);
+            printf("   Ê±ÉĞÅİ°ÉÏúÁ¿¹ÜÀíÏµÍ³");
+            toxy(X_COORD+22,9);
+            printf("-------------------------------------");
+            toxy(X_COORD+27,11);
+            printf("ÇëÊäÈëÊı×Ö0-2£¡\n");//·¢ÏÖÒ»¸öbug£¬ÊäÈë´íÎóÖ®ºóÒª°´Á½ÏÂÒÔÉÏ0²Å¿ÉÒÔÍË³ö¡£(ÒÑÍê³É)
+            Sleep(1000);
             system("CLS");
             Check_Year_Sales();//ËüÊÇµ÷ÓÃÁËÖ®ºóreturnµ½ÉÏÒ»¸öCheck_Year_Sales()
         }
         else
         {
             ShowYearSales(b);
-            printf("--------------------------\n");
-            printf("\nÇë°´ÈÎÒâ¼ü¼ÌĞø£¡\n");
+            printf("\t\t\t\t\t\t\t\t--------------------------\n");
+            printf("\t\t\t\t\t\t\t\tÇë°´ÈÎÒâ¼ü¼ÌĞø£¡\n");
             getch();
         }
     }
 }
 
+float CheckFloat(char a[],int len)  //¼ì²éÊäÈëÊÇ·ñÎªÕı¸¡µãÊı£¬ÇÒÖ»ÄÜ¾«È·µ½Ğ¡ÊıµãºóÒ»Î»
+{
+    int i,j,k;
+    int dot_num = 0;  //Ğ¡ÊıµãµÄ¸öÊı
+    float integer=0;  //ÕûÊı²¿·ÖµÄÖµ
+    float dot=0;  //Ğ¡Êı²¿·ÖµÄÖµ
+    int dot_place;  //Ğ¡ÊıµãµÄÎ»ÖÃ
+    for(i=0;i<len;i++)
+    {
+        if((a[i]<'0'||a[i]>'9')&&a[i]!='.')
+        {
+            return -1; //ÊäÈëµÄ²»ÊÇÊı
+        }
+    }
+    for(i=0;i<len;i++)
+    {
+        if(a[i]=='.')
+        {
+            dot_num++;
+        }
+    }
+    if(dot_num>=2)  //ÊäÈëÁËÁ½¸öÒÔÉÏµÄĞ¡Êıµã
+    {
+        return -1;
+    }
+    if(a[0]=='.')  // .12314ÕâÖÖÊäÈë
+    {
+        return -1;
+    }
+    if(a[0]=='0'&&a[1]!='.')  //012.23   0000
+    {
+        return -1;
+    }
+    dot_place = len;
+    for(i=0;i<len;i++)  //ÕÒµ½Ğ¡ÊıµãÎ»ÖÃ
+    {
+        if(a[i]=='.')
+        {
+            dot_place = i;
+            break;
+        }
+    }
+    for(i=0;i<dot_place;i++)
+    {
+        int num;
+        num = a[i]-'0';
+        integer += num*pow(10,dot_place-1-i);
+    }
+    if(len-dot_place-1>=2)
+    {
+        return -2;  //Ğ¡ÊıÎ»ÓĞÁ½Î»ÒÔÉÏ
+    }
+    if(dot_place!=len)
+    {
+        dot = 0.1*(a[dot_place+1]-'0');
+    }
+    return integer+dot;  //·µ»ØÊäÈëµÄ¸¡µãÊıµÄÖµ
+}
+
+void EnsureModify(Beverage* p,float c)
+{
+    char a;  //ÓÃÓÚ±£´æÑ¡Ôñ
+    system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
+    system("cls");  //ÇåÆÁ
+    HideCursor(0);  //Òş²Ø¹â±ê
+    toxy(X_COORD+28,8);
+    printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+26,10);
+    printf("%sµÄ¼Û¸ñ¼´½«´Ó%.1f¸ü¸ÄÎª%.1f:",p->name,p->price,c);
+    toxy(X_COORD+36,13);
+    printf("1.È·ÈÏ");
+    toxy(X_COORD+36,15);
+    printf("2.È¡Ïû");
+    fflush(stdin);
+    a = getch();
+    fflush(stdin);
+    switch(a)
+    {
+        case '1':
+            toxy(X_COORD+26,17);
+            printf("ĞŞ¸Ä³É¹¦!!!2sºó½«×Ô¶¯·µ»ØÉÌÆ·¹ÜÀíÒ³Ãæ");
+            p->price = c;
+            Sleep(2000);
+            ManageGoods();
+            return;
+        case '2':
+            toxy(X_COORD+26,17);
+            printf("È¡Ïû³É¹¦!!!2sºó½«×Ô¶¯·µ»ØĞŞ¸ÄÉÌÆ·¼Û¸ñÒ³Ãæ");
+            Sleep(2000);
+            ModifyPrice();
+            return;
+        default:
+            toxy(X_COORD+24,17);
+            printf("ÊäÈë²»ºÏ¹æ£¬Çë¸ù¾İ±êºÅ½øĞĞÑ¡Ôñ");
+            EnsureModify(p,c);
+            return;
+    }
+}
+
 void ModifyPrice()//µ÷ÕûÉÌÆ·¼Û¸ñº¯ÊıÉè¼ÆË¼Â·£º1ÊäÈëÉÌÆ·Ãû×Ö2²éÕÒ2.1ÕÒµ½¾ÍÏÔÊ¾¼Û¸ñ²¢ÇÒÌáÊ¾¸ÄÎª¶àÉÙÇ®2.2Ã»ÕÒµ½¾ÍÌáÊ¾Ã»ÕÒµ½ÊÇ·ñ¼ÌĞøÕÒ3¼ÌĞø£ºµ÷ÓÃ±¾º¯Êı3.1²»¼ÌĞø£º·µ»ØÉÌÆ·¹ÜÀí²Ëµ¥
 {
-    char a[21];
-    Beverage *b;
-    b=head_beverage;
-    char c,d;//ÓÃÀ´ÅĞ¶ÏÊÇ·ñµÄ
-
-    system("CLS");
-    printf("»¶Ó­À´µ½ĞŞ¸Ä¼Û¸ñ½çÃæ£¡(0·µ»Ø)\n");
-    printf("---------------------------\n");
-    printf("ÇëÊäÈëĞŞ¸Ä¼Û¸ñµÄÉÌÆ·Ãû×Ö£º\n");//²âÊÔ£ºå°å¼å¥¶èŒ¶
-
+    system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
+    system("cls");  //ÇåÆÁ
+    HideCursor(1);  //ÏÔÊ¾¹â±ê
+    char a[2000];
+    int beverage_num;
+    int re;
+    toxy(X_COORD+28,8);
+    printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+26,11);
+    printf("ÇëÑ¡ÔñĞèÒªĞŞ¸Ä¼Û¸ñµÄÉÌÆ·:");
+    beverage_num = Show_Goods(head_beverage);
     fflush(stdin);
-    scanf("%20s",a);
+    scanf("%s",a);
     fflush(stdin);
-
-    if(strcmp(a,"0")==0)
+    re = Check_Number(a,beverage_num,3);
+    if(re>0)
     {
-        ManageGoods();
-    }
-
-    //Ö®ºó¿ªÊ¼±éÀú
-    while(b->next!=NULL&&strcmp(b->name,a)!=0)
-    {
-        b=b->next;
-    }
-    if(strcmp(b->name,a)==0)
-    {
-        printf("ÄãÏë°Ñ%sµÄ¼Û¸ñ´Ó%f¸ÄÎª£º\n",b->name,b->price);
-
-        fflush(stdin);
-        scanf("%f",&b->price);
-        fflush(stdin);
-
-        printf("ĞŞ¸Ä³É¹¦£¡\nÊÇ·ñ¼ÌĞø£¿\n1.ÊÇ  2.·ñ\n");
-
         while(1)
         {
+            system("cls");
+            Beverage *q;
+            char b[2000];
+            int newprice;
+            q = Find_Beverage(re,head_beverage);
+            toxy(X_COORD+28,8);
+            printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+            toxy(X_COORD+22,9);
+            printf("-------------------------------------");
+            toxy(X_COORD+26,13);
+            printf("ÇëÊäÈëĞ¡ÓÚµÈÓÚ100µÄ·Ç¸º¸¡µãÊı");
+            toxy(X_COORD+26,14);
+            printf("ÊäÈëµÄ¸¡µãÊıÓ¦¾«È·µ½Ğ¡ÊıµãºóÒ»Î»");
+            toxy(X_COORD+26,11);
+            printf("ÇëÊäÈë%sĞŞ¸ÄºóµÄ¼Û¸ñ:",q->name);
             fflush(stdin);
-            scanf("%c",&c);
+            scanf("%s",b);
             fflush(stdin);
-
-            switch(c)
+            newprice = CheckFloat(b,strlen(b));
+            if(newprice>=100)
             {
-                case '1':ModifyPrice();
-                case '2':printf("¼´½«ÍË³öµ½ÉÌÆ·¹ÜÀí²Ëµ¥£¡\n");Sleep(2);ManageGoods();
-                default :printf("ÇëÊäÈë1»ò2£¡\n");break;
+                toxy(X_COORD+26,15);
+                printf("ÊäÈëµÄ¸¡µãÊı³¬¹ı100,Çë1sºóÖØĞÂÊäÈë");
+                Sleep(1000);
+                continue;
+            }
+            else if(newprice==-1)
+            {
+                toxy(X_COORD+26,15);
+                printf("ÊäÈë²»ºÏ¹æ£¬Çë1sºóÖØĞÂÊäÈë·Ç¸º¸¡µãÊı");
+                Sleep(1000);
+                continue;
+            }
+            else if(newprice==-2)
+            {
+                toxy(X_COORD+26,15);
+                printf("Ö»ÄÜ¾«È·µ½Ğ¡ÊıµãºóÒ»Î»£¬Çë1sºóÖØĞÂÊäÈë");
+                Sleep(1000);
+                continue;
+            }
+            else if(newprice==q->price)
+            {
+                toxy(X_COORD+26,15);
+                printf("ÊäÈëµÄ¼Û¸ñÓëÔ­¼ÛÏàÍ¬£¬Çë1sºóÖØĞÂÊäÈë");
+                Sleep(1000);
+                continue;
+            }
+            else
+            {
+                toxy(X_COORD+26,15);
+                EnsureModify(q,newprice);
+                return;
             }
         }
+    }
+    else if(re==0)
+    {
+        ManageGoods();
+        return;
+    }
+    else if(re==-1)
+    {
+        toxy(X_COORD+21,33);
+        HideCursor(0);
+        printf("ÊäÈëÊı×Ö³¬¹ıÒûÆ·µÄÊıÁ¿,Çë1sºóÖØĞÂÑ¡Ôñ");
+        Sleep(1000);  //ÔİÍ£1ÃëÏÔÊ¾ÌáÊ¾ĞÅÏ¢
+        DeleteGoods();  //ÖØĞÂÊäÈë
+        return;
     }
     else
     {
-        system("CLS");
-        printf("ÕÒ²»µ½ÉÌÆ·%s£¡ÊÇ·ñ¼ÌĞø\n1.ÊÇ  2.·ñ\n",a);
-
-
-        while(1)
-        {
-            fflush(stdin);
-            scanf("%c",&d);
-            fflush(stdin);
-
-            switch(d)
-            {
-                case '1':ModifyPrice();
-                case '2':printf("¼´½«ÍË³öµ½ÉÌÆ·¹ÜÀí²Ëµ¥£¡\n");Sleep(2);ManageGoods();
-                default :printf("ÇëÊäÈë1»ò2£¡\n");break;
-            }
-        }
+        toxy(X_COORD+21,33);
+        HideCursor(0);
+        printf("ÊäÈëÄÚÈİ²»ºÏ¹æ£¬Çë1sºóÖØĞÂÊäÈëÒûÆ·¶ÔÓ¦µÄid");
+        Sleep(1000);  //ÔİÍ£1ÃëÏÔÊ¾ÌáÊ¾ĞÅÏ¢
+        DeleteGoods();  //ÖØĞÂÊäÈë
+        return;
     }
-
+    return;
 }
 
-void AddGoods()
+void AddGoods()  //bugÕâÀïÌí¼ÓÉÌÆ·½çÃæÔÚshellÀïÏÔÊ¾ÓĞµãÆæ¹Ö£¬ÕâÓ¦¸ÃÊÇAddGoodsº¯ÊıÉÏÒ»¼¶µÄÊ§Îó
 {
     char a[21];//ÓÃÀ´´¢´æÊäÈëµÄÃû×Ö
     char c;//cÓÃÀ´Ñ¡ÔñµÄ
     Beverage*b,*d,*e;//bÓÃÀ´²éÖØ£¬dÓÃÀ´´æ´¢ĞÅÏ¢,eÓÃÀ´Á¬½ÓÁ´±í¡££¨´æ´¢ĞÅÏ¢µÄÖ¸ÕëĞèÒª¿ª±Ù¿Õ¼ä£¬¶ø²éÖØºÍÁ¬½ÓÁ´±íµÄ²»ĞèÒª£©
     e=b=Create_BeverageLinkList();
 
+    system("CLS");
+    toxy(X_COORD+28,8);
+    printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+27,11);
     printf("»¶Ó­À´µ½Ìí¼ÓÉÌÆ·½çÃæ£¡(0·µ»Ø)\n");
+    toxy(X_COORD+27,12);
     printf("-----------------------------\n");
+    toxy(X_COORD+27,13);
     printf("ÇëÊäÈëÉÌÆ·Ãû³Æ£º\n");//Ö®ºóÒª±éÀú¿´Ò»¿´ÊÇ·ñÓĞÒ»ÑùµÄÃû³ÆµÄÒûÆ·¡£ÓĞ¾ÍÌáÊ¾ÓĞÁË£¬Ã»ÓĞ¾ÍÌáÊ¾ĞÂÉÌÆ·¡£
 
     fflush(stdin);
+    toxy(X_COORD+43,13);
     scanf("%20s",a);
     fflush(stdin);
 
@@ -4581,6 +4973,11 @@ void AddGoods()
     }
     if(strcmp(a,b->name)==0)
     {
+        toxy(X_COORD+28,8);
+        printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+        toxy(X_COORD+22,9);
+        printf("-------------------------------------");
+        toxy(X_COORD+27,11);
         printf("ÒÑ¾­ÓĞ´ËÉÌÆ·ÁË£¡²»ĞèÒªÖØ¸´Ìí¼Ó£¡");
         Sleep(2);
     }
@@ -4588,9 +4985,18 @@ void AddGoods()
     {
         while(1)
         {
-            printf("´ËÉÌÆ·»¹Î´Ìí¼Ó£¡\nÄãÏëÌí¼ÓÂğ£¿\n1.ÊÇ\t2.·ñ\n");
+            system("CLS");
+            toxy(X_COORD+28,8);
+            printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+            toxy(X_COORD+22,9);
+            printf("-------------------------------------");
+            toxy(X_COORD+27,11);
+            printf("´ËÉÌÆ·»¹Î´Ìí¼Ó£¡ÄãÏëÌí¼ÓÂğ£¿");
+            toxy(X_COORD+27,12);
+            printf("1.ÊÇ\t2.·ñ\n");
 
             fflush(stdin);
+            toxy(X_COORD+27,13);
             scanf("%c",&c);//printf("²âÊÔ£¡\n");
             fflush(stdin);
 
@@ -4600,9 +5006,16 @@ void AddGoods()
                 d=(Beverage*)malloc(sizeof(Beverage));
 
                 strcpy(d->name,a);//°ÑÊäÈëµÄÃû×Ö´æ´¢µ½aÊı×éÖĞ£¬È»ºó¸³Öµ¸ødÀïÃæµÄname
-                printf("ÇëÊäÈëÉÌÆ·%sµÄ¶¨¼Û£º");
+
+                toxy(X_COORD+28,8);
+                printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+                toxy(X_COORD+22,9);
+                printf("-------------------------------------");
+                toxy(X_COORD+27,11);
+                printf("ÇëÊäÈëÉÌÆ·%sµÄ¶¨¼Û£º",a);
 
                 fflush(stdin);
+                toxy(X_COORD+27,12);
                 scanf("%f",&d->price);//Ö®ºó°Ñd°ó¶¨µ½Á´±íÀïÃæ£¨id×Ô¶¯Éú³É£©
                 fflush(stdin);
 
@@ -4611,203 +5024,350 @@ void AddGoods()
                 e->next=d;
                 e=d;//Á´±í¼ÓÉÏÒÔºó×îºóÔÚmainº¯ÊıÖĞµ÷ÓÃÖØĞ´¾ÍĞĞÁË¡£
 
+                toxy(X_COORD+27,13);
                 printf("Ìí¼Ó³É¹¦£¡\n");//Ö®ºóÒªÉú³ÉÒ»¸öid²¢ÇÒÒªĞ´Èëµ½ÎÄ¼şÀïÃæ£ºÍúÒ¯ÊÇËµÎÒÏÈ°ÑÕâ¸öĞÅÏ¢Ğ´µ½Õâ¸öÈ«¾ÖÁ´±íÀïÃæ£¬È»ºóÔÙÓÃÕâ¸öÁ´±íĞ´Èëµ½ÎÄ¼şÀïÃæ¡£
                 //Õâ¸öIDºÅÔõÃ´×Ô¶¯Éú³É£¿->µ±°ÑĞÂµÄ½áµãÌí¼Óµ½È«¾ÖÁ´±í±äÁ¿µÄÖ®Ç°£¬Òª°ÑÖ¸ÕëÒÆµ½Á´±íÄ©Î²£¬°ÑÖ¸ÕëºóÒÆÒ»Î»£¬¾Í++£¬×îºó¾Í°ÑÄÇ¸ö++µÄÊı±ä³ÉidºÅ¡£
-                Sleep(2);
-                break;
+                Sleep(1000);
+                ChangeGoods();
             }
             else if(c=='2')//Î´Íê£º³ı´ËÖ®Íâ»¹Òª¼ì²éÊäÈëÊÇ·ñÊÇ³ıÁË1ºÍ2Ö®ÍâµÄÊı¡£
             {
                 system("CLS");
-                printf("¼´½«ÍË³öµ½Ö÷½çÃæ£¡\n");
-                Sleep(2);
+                toxy(X_COORD+28,8);
+                printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+                toxy(X_COORD+22,9);
+                printf("-------------------------------------");
+                toxy(X_COORD+27,11);
+                printf("¼´½«ÍË³öµ½ÉÌÆ·¹ÜÀí½çÃæ£¡\n");
+                Sleep(1000);
                 ManageGoods();
             }
             else
             {
+                system("CLS");
+                toxy(X_COORD+28,8);
+                printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+                toxy(X_COORD+22,9);
+                printf("-------------------------------------");
+                toxy(X_COORD+27,11);
                 printf("ÇëÊäÈë1»òÕß2!\n");
-                Sleep(2);
+                Sleep(1000);
                 system("CLS");
             }
         }
     }
 }
 
-
-void DeleteGoods()//¹¦ÄÜÉè¼Æ£º1ÊäÈëÉ¾³ıÉÌÆ·µÄÃû×Ö2¼ì²éÊÇ·ñÓĞ´ËÉÌÆ·3.1Ã»ÓĞÔòÌáÊ¾Ã»ÓĞ´ËÉÌÆ·3.2ÓĞÔòÌáÊ¾ÓÉ´ËÉÌÆ·£¬ÊÇ·ñÉ¾³ı4.1ÊÇµÄ»°ÌáÊ¾É¾³ı³É¹¦4.2·ñµÄ»°ÌáÊ¾¼´½«·µ»ØÉÏ¼¶
+int Show_Goods(Beverage *h)  //Õ¹Ê¾ÒûÆ·ÀàĞÍ,·µ»Øµ±Ç°ÒûÆ·¸öÊı
 {
-    char a[20];//´æ´¢ÉÌÆ·Ãû³Æ¡£
-    Beverage*b,*c;//bÓÃÀ´±éÀúÕÒµ½Ä¿±ê£¬cÓÃÀ´Ö¸ÏòÇ°Ò»¸ö¡£
-    int temp=1;//ÓÃÀ´¼ÇÂ¼ÊÇµÚ¼¸¸ö½áµãÕÒµ½´ËÉÌÆ·µÄ£¬temp-1Ò²ÓÃÓÚÒÆ¶¯µ½±»É¾³ı½áµãµÄÇ°Ò»¸ö¡£
-    char d,e;//ÓÃÓÚÑ¡Ôñ
-    c=head_beverage;
-    b=c->next;
-    printf("»¶Ó­À´µ½É¾³ı½çÃæ£¡(0·µ»Ø)\n");
-    printf("------------------------\n");
-    printf("ÇëÊäÈëÉ¾³ıÉÌÆ·µÄÃû³Æ£º");//²âÊÔ°¸Àı£ºå°å¼å¥¶èŒ¶
-    fflush(stdin);
-    scanf("%s",a);
-    fflush(stdin);
-    if(strcmp(a,"0")==0)//Ïë×öÒ»¸ö0·µ»Ø£¬µ«ÊÇ»áÓĞbug
+    int num=0;
+    int x1=22,x2=34,x3=46,y=13;  //¹â±êËùÔÚµÄÎ»ÖÃ×ø±ê
+    if(h->next==NULL)
     {
-        ChangeGoods();
-    }
-    while(b!=NULL&&strcmp(b->name,a)!=0)//ÕâÀï¾ÍÊÇ±éÀúÈ«¾Ö±äÁ¿ÀïµÄÄÇ¸öÁ´±íÁË¡£
-    {
-        b=b->next;//printf("temp=%d\n",temp);
-        temp++;
-    }
-    if(b!=NULL)//Õâ¸öÊÇÕÒµ½ÁËµÄÇé¿ö¡£²»ÖªÎªºÎ»»³Éif(strcmp(b->name,a)==0)ÅĞ¶Ï¾ÍÎŞ·¨Ö´ĞĞelse?µ«ÊÇ»¹ÊÇÄÜÕı³£Ö´ĞĞÕÒµ½ÉÌÆ·
-    {
-        while(1)
-        {
-            system("CLS");
-            printf("ÕÒµ½ÁË´ËÉÌÆ·£¬ÊÇ·ñÉ¾³ı£¿\n1.ÊÇ\t2.·ñ\n");//ÕâÀïÆäÊµ¿ÉÒÔ°Ñ¡°´Ë¡±»»³ÉÉ½¹µÃû×Ö¡£
-            fflush(stdin);
-            scanf("%c",&d);
-            fflush(stdin);
-            if(d=='1')
-            {
-                system("CLS");
-                //É¾³ıÁ´±í²Ù×÷
-                for(int i=1;i<temp;i++)
-                {
-                    c=c->next;
-                }
-                c->next=b->next;
-                free(b);
-
-                printf("É¾³ı³É¹¦£¡¼´½«·µ»ØÉ¾³ı½çÃæ¡£\n");
-                Sleep(2);
-
-                break;
-            }
-            else if(d=='2')//Î´Íê£º³ı´ËÖ®Íâ»¹Òª¼ì²éÊäÈëÊÇ·ñÊÇ³ıÁË1ºÍ2Ö®ÍâµÄÊı¡£
-            {
-                system("CLS");
-                printf("¼´½«ÍË³öµ½ÉÏ¼¶½çÃæ£¡\n");
-                Sleep(2);
-                DeleteGoods();
-            }
-            else
-            {
-                printf("ÇëÊäÈë1»òÕß2!\n");
-                Sleep(2);
-                system("CLS");
-            }
-        }
+        toxy(X_COORD+x1,y);
+        printf("ÔİÎŞÒûÆ·...ÇëÁªÏµ¹ÜÀíÔ±½øĞĞÌí¼Ó");
     }
     else
     {
-        system("CLS");
-        printf("Î´ÕÒµ½´ËÉÌÆ·¡£ÊÇ·ñ»¹ĞèÒª²éÕÒ£¿\n1.ÊÇ 2.·ñ\n");
-        fflush(stdin);
-        scanf("%c",&e);
-        fflush(stdin);
-        while(1)
+        toxy(X_COORD + x1, y);
+        printf("ÒûÆ·id");
+        toxy(X_COORD + x2, y);
+        printf("ÒûÆ·Ãû³Æ");
+        toxy(X_COORD + x3, y);
+        printf("ÒûÆ·¼Û¸ñ(?)");
+        x1 += 2;
+        while (h->next != NULL)
         {
-            if(e=='1')
-            {
-                system("CLS");
-                DeleteGoods();
-            }
-            else if(e=='2')
-            {
-                printf("¼´½«ÍË³öµ½ÉÌÆ·¹ÜÀí²Ëµ¥½çÃæ£¡\n");
-                Sleep(2);
-                ManageGoods();
-            }
-            else
-            {
-                printf("ÇëÊäÈë1»òÕß2!\n");
-                Sleep(2);
-                system("CLS");
-            }
+            y += 1;
+            toxy(X_COORD + x1, y);
+            printf("%d", h->next->id);
+            toxy(X_COORD + x2, y);
+            printf("%s", h->next->name);
+            toxy(X_COORD + x3+2, y);
+            printf("%.1f", h->next->price);
+            h = h->next;
+            num++;
         }
+    }
+    y+=1;
+    toxy(X_COORD+x1,y);
+    printf("ÊäÈë0·µ»ØÉÏÒ»¼¶");
+    y+=1;
+    toxy(X_COORD+x1,y);
+    printf("ÊäÈëÒûÆ·µÄid½øĞĞÑ¡Ôñ(°´»Ø³µÈ·ÈÏ)£º");
+    return num;
+}
+
+int EnsureDelete(Beverage* p)  //¶ş´ÎÈ·ÈÏÉ¾³ı¸ÃÉÌÆ·,È·ÈÏ·µ»Ø1£¬È¡ÏûÉ¾³ı·µ»Ø-1
+{
+    char c;
+    system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
+    system("cls");  //ÇåÆÁ
+    HideCursor(0);  //Òş²Ø¹â±ê
+    toxy(X_COORD+28,8);
+    printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+26,11);
+    printf("È·ÈÏÉ¾³ıÉÌÆ·:%s?",p->name);
+    toxy(X_COORD+36,13);
+    printf("1.È·ÈÏ");
+    toxy(X_COORD+36,15);
+    printf("2.È¡Ïû");
+    fflush(stdin);
+    c = getch();
+    fflush(stdin);
+    switch (c)
+    {
+        case '1':
+            return 1;
+        case '2':
+            return -1;
+        default:
+            toxy(X_COORD+24,17);
+            printf("ÊäÈë²»ºÏ¹æ£¬Çë¸ù¾İ±êºÅ½øĞĞÑ¡Ôñ");
+            return EnsureDelete(p);
     }
 }
 
-void ChangeGoods()//ÔöÉ¾ÉÌÆ·ÖÖÀà¡£
+void DeleteGoods()  //É¾³ıÉÌÆ·Ò³Ãæ.bugÌí¼ÓÒûÁÏÖ®ºó£¬É¾³ıÉÌÆ·½çÃæ²¢Ã»ÓĞ³öÏÖ¡£
 {
-    char a;//ÓÃÀ´ÅĞ¶Ï
-    while(1)
+    system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
+    system("cls");  //ÇåÆÁ
+    HideCursor(0);  //Òş²Ø¹â±ê
+    char a[20];  //´æ´¢ÓÃ»§ÊäÈë
+    int beverage_num;  //ÉÌÆ·ÊıÁ¿
+    int re;
+    toxy(X_COORD+28,8);
+    printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+26,11);
+    printf("ÇëÑ¡ÔñĞèÒªÉ¾³ıµÄÉÌÆ·:");
+    beverage_num = Show_Goods(head_beverage);
+    fflush(stdin);
+    scanf("%s",a);
+    fflush(stdin);
+    re = Check_Number(a,beverage_num,3);
+    if(re>0)
     {
-        system("cls");
-        printf("ÔöÉ¾ÉÌÆ·ÖÖÀà½çÃæ£º\n");
-        printf("--------------------\n");
-        printf("1.ÔöÌíÉÌÆ·¡£\n");
-        printf("2.É¾³ıÉÌÆ·¡£\n");
-        printf("0.ÍË³öÖÁÉÏ¼¶¡£\n");
-        fflush(stdin);
-        scanf("%c",&a);
-        fflush(stdin);
-        if(a=='0')
-            ManageGoods();
-        system("cls");
-        switch(a)
+        Beverage *q,*q0;  //ÕÒµ½ÒûÆ·ÖĞidÎªcµÄÒûÆ·ÖÖÀà£¬ÓÃqÖ¸Ïò,q0Ö¸ÏòÆäÇ°Çı
+        q = Find_Beverage(re,head_beverage);
+        if(EnsureDelete(q)>0)  //È·ÈÏÉ¾³ı
         {
-            case '1':AddGoods();break;//switchÒ²ÊÇÑ­»·À´µÄ£¬breakÖ»ÄÜÌø³öÒ»¸öÑ­»·
-            case '2':DeleteGoods();break;
-            default: printf("ÇëÊäÈë0»ò1»ò2£¡\n");Sleep(2);break;
+            system("cls");
+            if(re==1)
+            {
+                q0 = head_beverage;
+            }
+            else
+            {
+                q0 = Find_Beverage(re-1,head_beverage);
+            }
+            q0->next = q->next;
+            while(q0->next!=NULL)  //ĞŞ¸ÄÉ¾³ıÉÌÆ·ºó¸÷ÉÌÆ·µÄid
+            {
+                q0->next->id-=1;
+                q0 = q0->next;
+            }
+            toxy(X_COORD+28,8);
+            printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+            toxy(X_COORD+22,9);
+            printf("-------------------------------------");
+            toxy(X_COORD+26,12);
+            printf("ÉÌÆ·:%sÒÑÉ¾³ı!!!",q->name);
+            toxy(X_COORD+26,14);
+            printf("Á½Ãëºó·µ»ØÑ¡Ôñ½çÃæ");
+            free(q);  //ÊÍ·Å±»É¾³ıÉÌÆ·¶ÔÓ¦½áµãµÄ¿Õ¼ä
+            Sleep(2000);
+            DeleteGoods();
+            return;
         }
+        else  //È¡ÏûÉ¾³ı
+        {
+            DeleteGoods();
+            return;
+        }
+    }
+    else if(re==0)
+    {
+        ManageGoods();
+        return;
+    }
+    else if(re==-1)
+    {
+        toxy(X_COORD+21,33);
+        HideCursor(0);
+        printf("ÊäÈëÊı×Ö³¬¹ıÒûÆ·µÄÊıÁ¿,Çë1sºóÖØĞÂÑ¡Ôñ");
+        Sleep(1000);  //ÔİÍ£1ÃëÏÔÊ¾ÌáÊ¾ĞÅÏ¢
+        DeleteGoods();  //ÖØĞÂÊäÈë
+        return;
+    }
+    else
+    {
+        toxy(X_COORD+21,33);
+        HideCursor(0);
+        printf("ÊäÈëÄÚÈİ²»ºÏ¹æ£¬Çë1sºóÖØĞÂÊäÈëÒûÆ·¶ÔÓ¦µÄid");
+        Sleep(1000);  //ÔİÍ£1ÃëÏÔÊ¾ÌáÊ¾ĞÅÏ¢
+        DeleteGoods();  //ÖØĞÂÊäÈë
+        return;
+    }
+    return;
+}
 
+void ChangeGoods()  //ÔöÉ¾ÉÌÆ·ÖÖÀà
+{
+    /*bugËùÓĞÎÒ¸ºÔğµÄ½çÃæ¶¼°´ÕÕÕâÀïÕâÑù¸ã,¶¼ÓĞ
+
+    toxy(X_COORD+28,8);
+    printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+27,11);
+
+    (ÒÑÍê³É)*/
+    system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
+    system("cls");  //ÇåÆÁ
+    HideCursor(0);  //Òş²Ø¹â±ê
+    char a;  //ÓÃÀ´ÅĞ¶Ï
+    toxy(X_COORD+28,8);
+    printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+27,11);
+    printf("1.Ìí¼ÓÉÌÆ·");
+    toxy(X_COORD+27,12);
+    printf("2.É¾³ıÉÌÆ·");
+    toxy(X_COORD+27,13);
+    printf("0.·µ»ØÉÏÒ»¼¶");
+    toxy(X_COORD+27,14);
+    printf("Esc.·µ»ØÖ÷Ò³Ãæ");
+    fflush(stdin);
+    a = getch();
+    fflush(stdin);
+    switch(a)
+    {
+        case '1':
+            AddGoods();
+            return;
+        case '2':
+            DeleteGoods();
+            return;
+        case '0':
+            ROOT();
+            return;
+        default:
+            toxy(X_COORD+27,16);
+            printf("Çë¸ù¾İ¶ÔÓ¦±êºÅ½øĞĞÑ¡Ôñ");
+            ChangeGoods();
+            return;
     }
 }
 
 void ShowSale()
 {
     int c;
-    while(1)
+    system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
+    system("cls");  //ÇåÆÁ
+    HideCursor(0);  //Òş²Ø¹â±ê
+    toxy(X_COORD+28,8);
+    printf("   Ê±ÉĞÅİ°ÉÏúÁ¿¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+31,10);
+    printf("| 1.²é¿´ÔÂÏúÁ¿");
+    toxy(X_COORD+48,10);
+    printf("|");
+    toxy(X_COORD+31,12);
+    printf("| 2.²é¿´¼¾¶ÈÏúÁ¿");
+    toxy(X_COORD+48,12);
+    printf("|");
+    toxy(X_COORD+31,14);
+    printf("| 3.²é¿´ÄêÏúÁ¿");
+    toxy(X_COORD+48,14);
+    printf("|");
+    toxy(X_COORD+31,16);
+    printf("| 0.·µ»ØÉÏÒ»¼¶");
+    toxy(X_COORD+48,16);
+    printf("|");
+    toxy(X_COORD+31,18);
+    printf("| ESC.·µ»ØÖ÷Ò³Ãæ");
+    toxy(X_COORD+48,18);
+    printf("|");
+    fflush(stdin);
+    c = getch();
+    fflush(stdin);
+    switch(c)
     {
-
-        system("CLS");
-        printf("»¶Ó­À´µ½²é¿´ÏúÁ¿½çÃæ£¡\n");
-        printf("----------------------\n");
-        printf("1.²é¿´ÔÂÏúÁ¿¡£\n");
-        printf("2.²é¿´¼¾¶ÈÏúÁ¿¡£\n");
-        printf("3.²é¿´ÄêÏúÁ¿¡£\n");
-        printf("£¨ÇëÊäÈëÊı×Ö1-3£©\n");
-        fflush(stdin);
-        c = getch();
-        fflush(stdin);
-        switch(c){
-            case 27: return;//27±íÊ¾esc¼ü¡£
-            case '1':
-                system("CLS");
-                Check_Month_Sales();//printf("ces!!");
-                break;
-            case '2':
-                system("CLS");
-                Check_Season_Sales();
-                break;
-            case '3':system("CLS");Check_Year_Sales();break;
-            default:continue;
-        }
+        case 27:
+            RootPasswordFlag = 1;
+            Default();
+            return;
+        case '1':
+            Check_Month_Sales();
+            return;
+        case '2':
+            Check_Season_Sales();
+            return;
+        case '3':
+            Check_Year_Sales();
+            return;
+        case '0':
+            ROOT();
+            return;
+        default:
+            ShowSale();
+            return;
     }
 }
 
-void ManageGoods()
+void ManageGoods()//bugÉÌÆ·¹ÜÀíÕâÀï·µ»ØÉÏÒ»¼¶È«²¿¶¼ÓĞÎÊÌâ¡£
 {
     char a;
-    while(1)
+    system(Normal_Color);;  //ÉèÖÃ±³¾°ÑÕÉ«Óë×ÖÌåÑÕÉ«
+    system("cls");  //ÇåÆÁ
+    HideCursor(0);  //Òş²Ø¹â±ê
+    toxy(X_COORD+28,8);
+    printf("   Ê±ÉĞÅİ°ÉÉÌÆ·¹ÜÀíÏµÍ³");
+    toxy(X_COORD+22,9);
+    printf("-------------------------------------");
+    toxy(X_COORD+30,10);
+    printf("| 1.µ÷ÕûÉÌÆ·¼Û¸ñ");
+    toxy(X_COORD+48,10);
+    printf("|");
+    toxy(X_COORD+30,12);
+    printf("| 2.ÔöÉ¾ÉÌÆ·ÖÖÀà");
+    toxy(X_COORD+48,12);
+    printf("|");
+    toxy(X_COORD+30,14);
+    printf("| 0.·µ»ØÉÏÒ»¼¶");
+    toxy(X_COORD+48,14);
+    printf("|");
+    toxy(X_COORD+30,16);
+    printf("| ESC.·µ»ØÖ÷Ò³Ãæ");
+    toxy(X_COORD+48,16);
+    printf("|");
+    fflush(stdin);
+    a = getch();
+    fflush(stdin);
+    switch(a)
     {
-        system("CLS");
-        printf("ÉÌÆ·¹ÜÀí²Ëµ¥\n");
-        printf("--------------\n");
-        printf("1.µ÷ÕûÉÌÆ·¼Û¸ñ\n");
-        printf("2.ÔöÉ¾ÉÌÆ·ÖÖÀà\n");
-        printf("--------------\n");
-        printf("¼üÅÌÊäÈë1 or 2\n");
-        fflush(stdin);
-        scanf("%c",&a);
-        fflush(stdin);
-        system("CLS");
-        switch(a)
-        {
-            case '1':ModifyPrice();break;
-            case '2':ChangeGoods();break;
-            default:break;
-        }
+        case '1':
+            ModifyPrice();
+            return;
+        case '2':
+            ChangeGoods();
+            return;
+        case '0':
+            ROOT();
+            return;
+        case 27:
+            RootPasswordFlag = 1;
+            Default();
+            return;
+        default:
+            ManageGoods();
+            return;
     }
 }
 
@@ -4821,61 +5381,61 @@ void Default()
         if(ExplicitFlag)  //´òÓ¡½»»¥½çÃæ
         {
             system("cls");
-            toxy(28,8);
-            printf("    »¶Ó­¹âÁÙÊ±ÉĞÅİ°É! ");
-            toxy(26,9);
+            toxy(X_COORD+28,8);
+            printf("     »¶Ó­¹âÁÙÊ±ÉĞÅİ°É!");
+            toxy(X_COORD+26,9);
             printf("-----------------------------");
-            toxy(26,10);
+            toxy(X_COORD+26,10);
             printf("|                           |");
-            toxy(26,11);
+            toxy(X_COORD+26,11);
             printf("|");
-            toxy(35,11);
+            toxy(X_COORD+35,11);
             printf("1.·Ç»áÔ±µã²Í");
-            toxy(54,11);
+            toxy(X_COORD+54,11);
             printf("|");
-            toxy(26,12);
+            toxy(X_COORD+26,12);
             printf("|                           |");
-            toxy(26,13);
+            toxy(X_COORD+26,13);
             printf("|");
-            toxy(35,13);
+            toxy(X_COORD+35,13);
             printf("2.»áÔ±µÇÂ½");
-            toxy(54,13);
+            toxy(X_COORD+54,13);
             printf("|");
-            toxy(26,14);
+            toxy(X_COORD+26,14);
             printf("|                           |");
-            toxy(26,15);
+            toxy(X_COORD+26,15);
             printf("|");
-            toxy(35,15);
+            toxy(X_COORD+35,15);
             printf("3.»áÔ±×¢²á");
-            toxy(54,15);
+            toxy(X_COORD+54,15);
             printf("|");
-            toxy(26,16);
+            toxy(X_COORD+26,16);
             printf("|                           |");
-            toxy(26,17);
+            toxy(X_COORD+26,17);
             printf("|");
-            toxy(35,17);
+            toxy(X_COORD+35,17);
             printf("4.¹ÜÀíÔ±µÇÂ½");
-            toxy(54,17);
+            toxy(X_COORD+54,17);
             printf("|");
-            toxy(26,18);
+            toxy(X_COORD+26,18);
             printf("|                           |");
-            toxy(26,19);
+            toxy(X_COORD+26,19);
             printf("|");
-            toxy(35,19);
+            toxy(X_COORD+35,19);
             printf("5.ÀÏ°åµÇÂ½");
-            toxy(54,19);
+            toxy(X_COORD+54,19);
             printf("|");
-            toxy(26,20);
+            toxy(X_COORD+26,20);
             printf("|                           |");
-            toxy(26,21);
+            toxy(X_COORD+26,21);
             printf("|");
-            toxy(35,21);
+            toxy(X_COORD+35,21);
             printf("ESC.ÍË³ö");
-            toxy(54,21);
+            toxy(X_COORD+54,21);
             printf("|");
-            toxy(26,22);
+            toxy(X_COORD+26,22);
             printf("|                           |");
-            toxy(26,23);
+            toxy(X_COORD+26,23);
             printf("-----------------------------");
         }
         char choose = 0;
@@ -4918,7 +5478,7 @@ void Default()
 
 void ROOT()
 {
-    if(RootLogin()==0)
+    if(RootPasswordFlag&&RootLogin()==0)
     {
         return;
     }
@@ -4929,19 +5489,19 @@ void ROOT()
             return;
         char choose = 0;
         printf("ESC Ê×Ò³\n *  ·µ»ØÉÏÒ»¼¶");
-        toxy(28, 8);
+        toxy(X_COORD+28, 8);
         printf("     Ê±ÉĞÅİ°ÉROOTÏµÍ³");
-        toxy(22,9);
+        toxy(X_COORD+22,9);
         printf("-------------------------------------");
-        toxy(Lstrict + w, Upstrict);
+        toxy(X_COORD+Lstrict + w, Upstrict);
         printf("| 1.Ô±¹¤¹ÜÀí |");
-        toxy(Lstrict + w, Upstrict+2);
+        toxy(X_COORD+Lstrict + w, Upstrict+2);
         printf("| 2.¿â´æ¹ÜÀí |");
-        toxy(Lstrict + w, Upstrict+4);
+        toxy(X_COORD+Lstrict + w, Upstrict+4);
         printf("| 3.ÉÌÆ·¹ÜÀí |");
-        toxy(Lstrict + w, Upstrict+6);
+        toxy(X_COORD+Lstrict + w, Upstrict+6);
         printf("| 4.ÏúÁ¿¹ÜÀí |");
-        toxy(Lstrict + w, Upstrict+8);
+        toxy(X_COORD+Lstrict + w, Upstrict+8);
         printf("| 5.»áÔ±¹ÜÀí |");
         choose = getch();
         switch (choose)
@@ -4967,13 +5527,20 @@ void ROOT()
                 VIPadminoperation();
                 break;
             case 27:
+                RootPasswordFlag = 1;
+                Default();
                 return;
             case '*':
+                RootPasswordFlag = 1;
+                Default();
                 return;
+            default:
+                toxy(33,20);
+                printf("Çë¸ù¾İ¶ÔÓ¦±êºÅ½øĞĞÑ¡Ôñ");
         }
+        RootPasswordFlag = 1;
     }
 }
-
 
 void NotChangeWindowSize(){
     HWND hWnd = GetConsoleWindow(); //»ñµÃcmd´°¿Ú¾ä±ú
@@ -4992,7 +5559,6 @@ void NotChangeWindowSize(){
                  NULL);
 }
 
-
 int RootLogin()
 {
     int error = 0;
@@ -5003,23 +5569,23 @@ int RootLogin()
         int count = 0;
         int over = 0;
         char word=0;
-        char temp[100] = "ÇëÊäÈëÃÜÂë£º";
+        char temp[100] = "ÇëÊäÈë¹ÜÀíÃÜÂë£º";
         printf("ESC Ê×Ò³\n *  ·µ»ØÉÏÒ»¼¶");
-        toxy(28, 8);
+        toxy(X_COORD+28, 8);
         printf("     Ê±ÉĞÅİ°ÉµÇÂ½ÏµÍ³");
-        toxy(22,9);
+        toxy(X_COORD+22,9);
         printf("-------------------------------------");
-        toxy(Lstrict, Upstrict);
-        printf("ÇëÊäÈëÃÜÂë£º");
+        toxy(X_COORD+Lstrict, Upstrict);
+        printf("%s",temp);
         if(error)
         {
             Warning_Type;
-            toxy(Lstrict, Upstrict+1);
+            toxy(X_COORD+Lstrict, Upstrict+1);
             printf("ÃÜÂë´íÎó");
             Normal_Type;
             error = 0;
         }
-        toxy(Lstrict+strlen(temp),Upstrict );
+        toxy(X_COORD+Lstrict+strlen(temp),Upstrict );
         while(1)
         {
             word = getch();
@@ -5050,6 +5616,7 @@ int RootLogin()
         }
         if(strcmp(bosspassword,temp_password)==0)
         {
+            RootPasswordFlag = 0;
             return 1;
         }
         else
@@ -5080,7 +5647,6 @@ void SAVE()  //±£´æ³ÌĞòÖ´ĞĞ¹ı³ÌÖĞ¶ÔÊı¾İÁ´±íµÄ¸Ä¶¯£¬²¢ÖØĞÂĞ´ÈëÎÄ¼ş
     STAFFInputFile(head_staff);
 }
 
-
 int main()
 {
     INIT();
@@ -5089,4 +5655,5 @@ int main()
     system("pause");
     return 0;
 }
+
 
